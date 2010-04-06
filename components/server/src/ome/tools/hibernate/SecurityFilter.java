@@ -8,10 +8,9 @@
 package ome.tools.hibernate;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.orm.hibernate3.FilterDefinitionFactoryBean;
 
 import ome.conditions.InternalException;
 import ome.model.internal.Details;
@@ -20,6 +19,11 @@ import ome.model.internal.Permissions.Right;
 import ome.model.internal.Permissions.Role;
 import static ome.model.internal.Permissions.Role.*;
 import static ome.model.internal.Permissions.Right.*;
+import ome.security.basic.OmeroInterceptor;
+import ome.system.Roles;
+
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.orm.hibernate3.FilterDefinitionFactoryBean;
 
 /**
  * overrides {@link FilterDefinitionFactoryBean} in order to construct our
@@ -51,9 +55,9 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
 
     static public final String filterName = "securityFilter";
 
-    static private final Properties parameterTypes = new Properties();
-
     static private String defaultFilterCondition;
+
+
     static {
         parameterTypes.setProperty(is_share, "java.lang.Boolean");
         parameterTypes.setProperty(is_admin, "java.lang.Boolean");
