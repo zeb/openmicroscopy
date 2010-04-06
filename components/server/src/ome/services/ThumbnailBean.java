@@ -471,9 +471,9 @@ public class ThumbnailBean extends AbstractLevel2Service implements
     	StopWatch s1 = new CommonsLogStopWatch(
     			"omero.bulkLoadRenderingSettings");
     	List<RenderingDef> toReturn = iQuery.findAllByQuery(
-    			"select r from RenderingDef as r join fetch r.pixels " +
+    			"select r from RenderingDef as r join fetch r.pixels p " +
     			"join fetch r.details.updateEvent " +
-    			"join fetch r.pixels.details.updateEvent " +
+    			"join fetch p.details.updateEvent " +
     			"where r.details.owner.id = :id and r.pixels.id in (:ids)",
     			new Parameters().addId(getCurrentUserId()).addIds(pixelsIds));
     	s1.stop();
@@ -687,11 +687,11 @@ public class ThumbnailBean extends AbstractLevel2Service implements
             params.addIds(pool);
         	List<Thumbnail> thumbnailList = iQuery.findAllByQuery(
         			"select t from Thumbnail as t " +
-        			"join t.pixels " +
+        			"join t.pixels p " +
         			"join fetch t.details.updateEvent " +
         			"where t.sizeX = :x and t.sizeY = :y " + 
         			"and t.details.owner.id = :o_id " +
-        			"and t.pixels.id in (:ids)", params);
+        			"and p.id in (:ids)", params);
         	for (Thumbnail metadata : thumbnailList)
         	{
         	    Long pixelsId = metadata.getPixels().getId();
