@@ -172,7 +172,15 @@ public class FullTextIndexer extends SimpleWork {
                     if ("DELETE".equals(act)) {
                         action = new Purge(type, id);
                     } else if ("UPDATE".equals(act) || "INSERT".equals(act)) {
-                        action = new Index(get(session, type, id));
+                        IObject obj = get(session, type, id);
+                        if (obj == null) {
+                            log.error(String.format("Null returned! Purging "
+                                    + "since cannot index %s:Id_%s for %s", type
+                                    .getName(), id, eventLog));
+                            action = new Purge(type, id);
+                        } else {
+                            action = new Index(obj);
+                        }
                     } else {
                         log.error("Unknown action type: " + act);
                     }
