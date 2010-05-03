@@ -15,6 +15,7 @@
 from exceptions import Exception
 from omero.cli import BaseControl
 from omero_ext.strings import shlex
+from omero.util import edit_path
 import omero.java
 
 def getprefs(args, dir):
