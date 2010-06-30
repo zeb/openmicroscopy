@@ -8,7 +8,9 @@ package ome.server.itests.update;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import ome.api.ITypes;
 import ome.model.acquisition.Instrument;
@@ -18,6 +20,7 @@ import ome.model.annotations.CommentAnnotation;
 import ome.model.containers.Dataset;
 import ome.model.containers.Project;
 import ome.model.containers.ProjectDatasetLink;
+import ome.model.core.Channel;
 import ome.model.core.Image;
 import ome.model.core.OriginalFile;
 import ome.model.core.Pixels;
@@ -26,7 +29,6 @@ import ome.model.display.CodomainMapContext;
 import ome.model.display.RenderingDef;
 import ome.model.display.Thumbnail;
 import ome.model.enums.Correction;
-import ome.model.enums.Format;
 import ome.model.enums.Immersion;
 import ome.model.enums.Medium;
 import ome.model.jobs.ImportJob;
