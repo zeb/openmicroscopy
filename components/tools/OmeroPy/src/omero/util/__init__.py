@@ -458,6 +458,7 @@ class Resources:
         Resources.cleanup()
         """
 
+        self.stuff = []
         self._lock = threading.RLock()
         self.logger = logging.getLogger("omero.util.Resources")
         self.stop_event = stop_event
@@ -465,10 +466,9 @@ class Resources:
             self.stop_event = omero.util.concurrency.get_event(name="Resources")
 
         if sleeptime < 5:
-            raise exceptions.Exception("Sleep time should be greater than 5: " % sleeptime)
+            raise exceptions.Exception("Sleep time should be greater than 5: %s" % sleeptime)
 
         self.sleeptime = sleeptime
-        self.stuff = []
 
         class Task(threading.Thread):
             """
