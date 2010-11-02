@@ -618,3 +618,67 @@ class Environment:
             self.env[key] = os.pathsep.join([self.env[key], addition])
         else:
             self.set(key, addition)
+
+#
+# Miscellaneious utilities
+#
+
+def get_user_dir():
+    exceptions_to_handle = (ImportError)
+    try:
+        from pywintypes import com_error
+        from win32com.shell import shellcon, shell
+        exceptions_to_handle = (ImportError, com_error)
+        homeprop = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
+    except exceptions_to_handle:
+        homeprop = os.path.expanduser("~")
+    return homeprop
+
+def edit_path(path_or_obj, start_text):
+    f = path.path(path_or_obj)
+    editor = os.getenv("VISUAL") or os.getenv("EDITOR")
+    if not editor:
+        if platform.system() == "Windows":
+            editor = "Notepad.exe"
+        else:
+            editor = "vi"
+    f.write_text(start_text)
+    from which import which
+    editor_path = which(editor)
+    pid = os.spawnl(os.P_WAIT, editor_path, editor_path, f)
+    if pid:
+        re = RuntimeError("Couldn't spawn editor: %s" % editor)
+        re.pid = pid
+        raise re
+
+#From: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/157035
+def tail_lines(filename,linesback=10,returnlist=0):
+    """Does what "tail -10 filename" would have done
+       Parameters::
+            filename   file to read
+            linesback  Number of lines to read from end of file
+            returnlist Return a list containing the lines instead of a string
+
+    """
+    avgcharsperline=75
+
+    file = open(filename,'r')
+    while 1:
+        try: file.seek(-1 * avgcharsperline * linesback,2)
+        except IOError: file.seek(0)
+        if file.tell() == 0: atstart=1
+        else: atstart=0
+
+        lines=file.read().split("\n")
+        if (len(lines) > (linesback+1)) or atstart: break
+        #The lines are bigger than we thought
+        avgcharsperline=avgcharsperline * 1.3 #Inc avg for retry
+    file.close()
+
+    if len(lines) > linesback: start=len(lines)-linesback -1
+    else: start=0
+    if returnlist: return lines[start:len(lines)-1]
+
+    out=""
+    for l in lines[start:len(lines)-1]: out=out + l + "\n"
+    return out

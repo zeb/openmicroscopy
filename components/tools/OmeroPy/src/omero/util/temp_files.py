@@ -129,11 +129,11 @@ class TempFileManager(object):
         locktest = None
 
         omerotemp = os.environ.get("OMERO_TEMPDIR", None)
+        homeprop = None
         try:
-            from win32com.shell import shellcon, shell
-            homeprop = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
-        except ImportError:
-            homeprop = os.path.expanduser("~")
+            homeprop = get_user_dir()
+        except:
+            pass # ticket:3194
         tempprop = tempfile.gettempdir()
         targets = [omerotemp, homeprop, tempprop]
 
