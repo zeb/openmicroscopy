@@ -62,7 +62,20 @@ public class DeleteUnitTest extends MockObjectTestCase {
         am = mock(LocalAdmin.class);
         a = (LocalAdmin) am.proxy();
 
-        bean = new DeleteBean(a, null);
+        hm = mock(Session.class);
+        hibernate = (Session) hm.proxy();
+
+        xm = mock(Query.class);
+        query = (Query) xm.proxy();
+        hm.expects(atLeastOnce()).method("createQuery").will(returnValue(query));
+        xm.expects(atLeastOnce()).method("executeMethod").will(returnValue(0));
+
+        bean = new DeleteBean(a, new SessionFactory(null, null){
+            @Override
+            public Session getSession() {
+                return hibernate;
+            }
+        });
         service = bean;
 
         qm = mock(LocalQuery.class);
