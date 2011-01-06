@@ -50,6 +50,7 @@ import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
 import ome.system.ServiceFactory;
+import ome.util.SqlAction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,7 +60,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -928,14 +928,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      */
     private Session executeCloseSession(final String uuid) {
         return (Session) executor
-                .executeStateless(new Executor.SimpleStatelessWork(this,
+                .executeSql(new Executor.SimpleSqlWork(this,
                         "executeCloseSession") {
                     @Transactional(readOnly = false)
-                    public Object doWork(SimpleJdbcOperations jdbcOps) {
+                    public Object doWork(SqlAction sql) {
                         try {
-                            int count = jdbcOps.update(
-                                    "UPDATE session SET closed = now() "
-                                            + "WHERE uuid = ?", uuid);
+                            int count = sql.closeSessions(uuid);
                             if (count == 0) {
                                 log.warn("No session updated on closeSession:"
                                         + uuid);
@@ -955,10 +953,10 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     private Session executeInternalSession() {
         final Long sessionId = executeNextSessionId();
         return (Session) executor
-                .executeStateless(new Executor.SimpleStatelessWork(this,
+                .executeSql(new Executor.SimpleSqlWork(this,
                         "executeInternalSession") {
                     @Transactional(readOnly = false)
-                    public Object doWork(SimpleJdbcOperations jdbcOps) {
+                    public Object doWork(SqlAction sql) {
 
                         // Create a basic session
                         final Permissions p = Permissions.USER_PRIVATE;
@@ -970,9 +968,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
                         // Set the owner and node specially for an internal sess
                         long nodeId = 0L;
                         try {
-                            jdbcOps.queryForLong(
-                                    "SELECT id FROM node where uuid = ?",
-                                    internal_uuid);
+                            nodeId = sql.nodeId(internal_uuid);
                         } catch (EmptyResultDataAccessException erdae) {
                             // Using default node
                         }
@@ -994,22 +990,14 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
                         params.put("uuid", s.getUuid());
                         params.put("node", nodeId);
                         params.put("owner", roles.getRootId());
-                        int count = jdbcOps
-                                .update(
-                                        "insert into session "
-                                                + "(id,permissions,timetoidle,timetolive,started,closed,"
-                                                + "defaultpermissions,defaulteventtype,uuid,owner,node)"
-                                                + "values (:sid,-35,:ttl,:tti,:start,null,"
-                                                + ":perms,:type,:uuid,:owner,:node)",
-                                        params);
+                        params.put("agent", s.getUserAgent());
+                        int count = sql.insertSession(params);
                         if (count == 0) {
                             throw new InternalException(
                                     "Failed to insert new session: "
                                             + s.getUuid());
                         }
-                        Long id = jdbcOps.queryForLong(
-                                "SELECT id FROM session WHERE uuid = ?", s
-                                        .getUuid());
+                        Long id = sql.sessionId(s.getUuid());
                         s.setId(id);
                         return s;
                     }
@@ -1023,12 +1011,11 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      */
     private Long executeNextSessionId() {
         return (Long) executor
-                .executeStateless(new Executor.SimpleStatelessWork(this,
+                .executeSql(new Executor.SimpleSqlWork(this,
                         "executeNextSessionId") {
                     @Transactional(readOnly = false)
-                    public Object doWork(SimpleJdbcOperations jdbcOps) {
-                        return jdbcOps
-                                .queryForLong("select ome_nextval('seq_session')");
+                    public Object doWork(SqlAction sql) {
+                        return sql.nextSessionId();
                     }
                 });
     }

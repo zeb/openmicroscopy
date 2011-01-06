@@ -46,9 +46,13 @@ public class TableIdGenerator extends TableGenerator {
 
     long hiValue = -1;
 
-    SimpleJdbcTemplate jdbc = null;
+    private SqlAction sql = null;
 
-    TransactionTemplate tt;
+    private DataSource ds = null;
+
+    private TransactionTemplate tt = null;
+
+    private SimpleJdbcTemplate jdbc = null;
 
     @Override
     public void configure(Type type, Properties params, Dialect dialect)
@@ -60,11 +64,10 @@ public class TableIdGenerator extends TableGenerator {
         ConnectionProvider cp = session.getJDBCContext().getConnectionManager()
                 .getFactory().getConnectionProvider();
 
-        if (jdbc != null && tt != null) {
+        if (sql != null) {
             return; // Already done.
         }
 
-        DataSource ds = null;
         if (cp instanceof TransactionAwareDataSourceConnectionProvider) {
             TransactionAwareDataSourceConnectionProvider tadscp = (TransactionAwareDataSourceConnectionProvider) cp;
             ds = tadscp.getDataSource();
@@ -79,7 +82,7 @@ public class TableIdGenerator extends TableGenerator {
             }
         }
 
-        if (jdbc == null) {
+        if (ds == null) {
             throw new RuntimeException(
                     "Unexpected ConnectionProvider found. Last datasource = "
                             + ds);
@@ -93,10 +96,9 @@ public class TableIdGenerator extends TableGenerator {
         init(session);
 
         if (hiValue < 0 || value >= hiValue) {
-            tt.execute(new TransactionCallback() {
+            tt.execute(new TransactionCallback<Object>() {
                 public Object doInTransaction(TransactionStatus status) {
-                    hiValue = jdbc.queryForLong("select ome_nextval(?,?)",
-                            getSegmentValue(), getIncrementSize());
+                    hiValue = sql.nextValue(ds, getSegmentValue(), getIncrementSize());
                     if (log.isDebugEnabled()) {
                         log.debug("Loaded new hiValue " + hiValue + " for "
                                 + getSegmentValue());

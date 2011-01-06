@@ -40,12 +40,17 @@ import ome.security.LdapUtil;
 import ome.security.SecuritySystem;
 import ome.security.auth.RoleProvider;
 import ome.system.OmeroContext;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
+import ome.system.Roles;
+import ome.util.SqlAction;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapOperations;
 import org.springframework.ldap.core.LdapTemplate;
@@ -74,7 +79,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RevisionNumber("$Revision: 1552 $")
 public class LdapImpl extends AbstractLevel2Service implements LocalLdap {
 
-    protected final LdapOperations ldapOperations;
+    private final SqlAction sql;
 
     protected final SimpleJdbcOperations jdbc;
 
@@ -91,11 +96,11 @@ public class LdapImpl extends AbstractLevel2Service implements LocalLdap {
     protected final RoleProvider roleProvider;
 
     public LdapImpl(RoleProvider roleProvider, LdapOperations ldapOperations,
-            SimpleJdbcOperations jdbc, String newUserGroup, 
+            SqlAction sql, String newUserGroup, 
             String groups, String attributes, String values, boolean config) {
         this.roleProvider = roleProvider;
         this.ldapOperations = ldapOperations;
-        this.jdbc = jdbc;
+        this.sql = sql;
         this.newUserGroup = newUserGroup;
         this.groups = groups;
         this.attributes = attributes;

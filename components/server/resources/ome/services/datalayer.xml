@@ -80,18 +80,26 @@
     <property name="dataSource" ref="dataSource"/>
   </bean>
 
-  <bean id="simpleJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+  <bean id="simpleSqlAction" class="${omero.db.sql_action_class}">
     <description>
     Takes part in any currently running Hibernate transaction.
     </description>
-    <constructor-arg ref="dataSource"/>
+    <constructor-arg>
+      <bean class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+      </bean>
+    </constructor-arg>
   </bean>
   
-  <bean id="isolatedJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+  <bean id="isolatedSqlAction" class="${omero.db.sql_action_class}">
     <description>
     Provides JDBC access WITHOUT taking part in Hibernate transactions
     </description>
-    <constructor-arg ref="selfCorrectingDataSource"/>
+    <constructor-arg>
+      <bean class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <constructor-arg ref="selfCorrectingDataSource"/>
+      </bean>
+    </constructor-arg>
   </bean>
 
   <!--

@@ -9,6 +9,10 @@ package ome.services.blitz.impl;
 
 import ome.api.RawFileStore;
 import ome.services.blitz.util.BlitzExecutor;
+import ome.services.blitz.util.ServiceFactoryAware;
+import ome.services.blitz.util.TieAware;
+import ome.services.util.Executor;
+import ome.util.SqlAction;
 import omero.ServerError;
 import omero.api.AMD_RawFileStore_exists;
 import omero.api.AMD_RawFileStore_read;
@@ -19,6 +23,14 @@ import omero.api.AMD_StatefulServiceInterface_close;
 import omero.api.AMD_StatefulServiceInterface_passivate;
 import omero.api.AMD_StatefulServiceInterface_getCurrentEventContext;
 import omero.api._RawFileStoreOperations;
+import omero.api._RawFileStoreTie;
+import omero.grid.RepositoryPrx;
+import omero.grid.RepositoryPrxHelper;
+import omero.model.OriginalFile;
+import omero.util.IceMapper;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import Ice.Current;
 
 /**
