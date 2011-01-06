@@ -61,6 +61,7 @@ import ome.system.Roles;
 import ome.system.SimpleEventContext;
 import ome.tools.hibernate.QueryBuilder;
 import ome.tools.hibernate.SecureMerge;
+import ome.tools.hibernate.SessionFactory;
 import ome.util.SqlAction;
 import ome.util.Utils;
 
@@ -68,7 +69,6 @@ import org.hibernate.Criteria;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -102,7 +102,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
 
     protected final SqlAction sql;
 
-    protected final SessionFactory sf;
+    protected final SessionFactory osf;
 
     protected final MailSender mailSender;
 
@@ -121,12 +121,12 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         this.context = (OmeroContext) ctx;
     }
     
-    public AdminImpl(SqlAction sql, SessionFactory sf,
+    public AdminImpl(SqlAction sql, SessionFactory osf,
             MailSender mailSender, SimpleMailMessage templateMessage,
             ACLVoter aclVoter, PasswordProvider passwordProvider,
             RoleProvider roleProvider) {
         this.sql = sql;
-        this.sf = sf;
+        this.osf = osf;
         this.mailSender = mailSender;
         this.templateMessage = templateMessage;
         this.aclVoter = aclVoter;
