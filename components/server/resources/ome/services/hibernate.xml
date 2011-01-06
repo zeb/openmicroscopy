@@ -124,6 +124,7 @@
             <ref bean="securityFilter"/>
         </list>
     </property>
+    <property name="lobHandler" ref="lobHandler"/>
   </bean>
 
 </beans>
