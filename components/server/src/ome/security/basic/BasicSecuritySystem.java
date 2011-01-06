@@ -208,15 +208,18 @@ public class BasicSecuritySystem implements SecuritySystem,
         // http://opensource.atlassian.com/projects/hibernate/browse/HHH-1932
         EventContext ec = getEventContext();
         Session sess = (Session) session;
-        sess.enableFilter(SecurityFilter.filterName).setParameter(
-                SecurityFilter.is_share, ec.getCurrentShareId() != null)
-                .setParameter(SecurityFilter.is_admin, ec.isCurrentUserAdmin())
-                .setParameter(SecurityFilter.current_user,
-                        ec.getCurrentUserId()).setParameterList(
-                        SecurityFilter.current_groups,
-                        ec.getMemberOfGroupsList()).setParameterList(
-                        SecurityFilter.leader_of_groups,
-                        ec.getLeaderOfGroupsList());
+        Filter filter = sess.enableFilter(SecurityFilter.filterName);
+
+        Long shareId = ec.getCurrentShareId();
+        int share01 = shareId != null ? 1 : 0;
+
+        int admin01 = ec.isCurrentUserAdmin() ? 1 : 0;
+
+        filter.setParameter(SecurityFilter.is_share, share01); // ticket:2219, not checking -1 here.
+        filter.setParameter(SecurityFilter.is_admin, admin01);
+        filter.setParameter(SecurityFilter.current_user, ec.getCurrentUserId());
+        filter.setParameterList(SecurityFilter.current_groups, ec.getMemberOfGroupsList();
+        filter.setParameterList(SecurityFilter.leader_of_groups, ec.getLeaderOfGroupsList());
     }
 
     /**

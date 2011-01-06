@@ -53,6 +53,7 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
 
     static private final Properties parameterTypes = new Properties();
 
+
     static private String defaultFilterCondition;
     static {
         parameterTypes.setProperty(is_share, "java.lang.Boolean");
@@ -62,7 +63,7 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
         parameterTypes.setProperty(leader_of_groups, "long");
         // This can't be done statically because we need the securitySystem.
         defaultFilterCondition = String.format("\n( "
-                + "\n :is_share OR \n :is_admin OR "
+                + "\n 1 = :is_share OR \n 1 = :is_admin OR "
                 + "\n (group_id in (:leader_of_groups)) OR "
                 + "\n (owner_id = :current_user AND %s) OR " + // 1st arg U
                 "\n (group_id in (:current_groups) AND %s) OR " + // 2nd arg G
