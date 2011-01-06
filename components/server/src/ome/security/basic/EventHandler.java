@@ -75,7 +75,7 @@ public class EventHandler implements MethodInterceptor {
             TransactionAttributeSource txSource) {
         this(isolatedSql, simpleSql, securitySystem, factory, txSource, false);
     }
-    
+
     public EventHandler(SqlAction isolatedSql,
             SqlAction simpleSql,
             BasicSecuritySystem securitySystem, SessionFactory factory,
@@ -104,19 +104,17 @@ public class EventHandler implements MethodInterceptor {
         if (!readOnly && this.readOnly) {
             throw new ApiUsageException("This instance is read-only");
         }
-        
+
         // ticket:1254
-        Session session = factory.getSession();
-        Statement statement = session.connection().createStatement();
-        statement.execute("set constraints all deferred;");
-        
-        secSys.loadEventContext(readOnly, isClose);
-        
         // and ticket:1266
+        final Session session = factory.getSession();
+
         if (!readOnly) {
-            statement.execute("COMMIT;");
-            statement.execute("BEGIN");
+            simpleSql.deferConstraints();
         }
+
+        secSys.loadEventContext(readOnly, isClose);
+
         // now the user can be considered to be logged in.
         EventContext ec = secSys.getEventContext();
         if (log.isInfoEnabled()) {
