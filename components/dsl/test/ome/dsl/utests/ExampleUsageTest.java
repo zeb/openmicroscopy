@@ -39,7 +39,7 @@ public class ExampleUsageTest extends TestCase {
     @Configuration(beforeTestMethod = true)
     protected void setUp() throws Exception {
         File f = ResourceUtils.getFile("classpath:type.xml");
-        sr = new SaxReader(f);
+        sr = new SaxReader("psql", f);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class ExampleUsageTest extends TestCase {
                 + "common" + File.separator + "resources" + File.separator
                 + "Mappings.ome.xml"); // FIXME circular deps.
         log.error(mappings);
-        SaxReader nsr = new SaxReader(mappings);
+        SaxReader nsr = new SaxReader("psql", mappings);
         nsr.parse();
         for (Iterator it = nsr.process().iterator(); it.hasNext();) {
             SemanticType st = (SemanticType) it.next();
