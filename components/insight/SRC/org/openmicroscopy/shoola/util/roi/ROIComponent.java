@@ -140,7 +140,7 @@ public class ROIComponent
 		AttributeKeys.TEXT_COLOR.set(fig, TEXT_COLOR);
 		AttributeKeys.STROKE_WIDTH.set(fig, STROKE_WIDTH);
 		MeasurementAttributes.SHOWID.set(fig, false);
-		if(fig instanceof MeasureLineFigure)
+		if (fig instanceof MeasureLineFigure)
 			MeasurementAttributes.SHOWMEASUREMENT.set(fig, true);
 		else
 			MeasurementAttributes.SHOWMEASUREMENT.set(fig, false);
@@ -292,7 +292,8 @@ public class ROIComponent
      * @throws NoSuchROIException 
      * @throws ROICreationException 
      */
-    public ROI addROI(ROIFigure figure, Coord3D currentPlane, boolean addAttribs)
+    public ROI addROI(ROIFigure figure, Coord3D currentPlane, 
+    		boolean addAttribs)
     	throws ROICreationException, NoSuchROIException
     {
     	if (figure == null) 

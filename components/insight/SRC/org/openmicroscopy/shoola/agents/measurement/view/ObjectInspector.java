@@ -73,7 +73,13 @@ class ObjectInspector
 	public final static int		INDEX = MeasurementViewerUI.INSPECTOR_INDEX;
 
 	/** Collection of column names. */
-	private static List<String>			columnNames;
+	private static final List<String>			COLUMN_NAMES;
+	
+	/** The row indicating to show the text or not. */
+	private static final int SHOW_TEXT_ROW = 3;
+	
+	/** The row indicating to show the measurement or not. */
+	private static final int SHOW_MEASUREMENT_ROW = 4;
 	
 	/** The name of the panel. */
 	private static final String			NAME = "Inspector";
@@ -88,9 +94,9 @@ class ObjectInspector
 	private MeasurementViewerModel		model;
 
 	static {
-		columnNames = new ArrayList<String>(2);
-		columnNames.add("Field");
-		columnNames.add("Value");
+		COLUMN_NAMES = new ArrayList<String>(2);
+		COLUMN_NAMES.add("Field");
+		COLUMN_NAMES.add("Value");
 	}
 	
 	/** Initializes the component composing the display. */
@@ -113,7 +119,7 @@ class ObjectInspector
 		l.add(new AttributeField(MeasurementAttributes.STROKE_COLOR, 
 				"Line Colour", false));
 		//create the table
-		fieldTable = new FigureTable(new FigureTableModel(l, columnNames));
+		fieldTable = new FigureTable(new FigureTableModel(l, COLUMN_NAMES));
 		fieldTable.getTableHeader().setReorderingAllowed(false);
 		fieldTable.setRowHeight(26);
 		fieldTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -250,6 +256,39 @@ class ObjectInspector
 		fieldTable.getModel().setValueAt(c, row, col);
 	}
 
+	/**
+	 * Returns <code>true</code> if the text has to be shown, 
+	 * <code>false</code> otherwise.
+	 * 
+	 * @return See above.
+	 */
+	boolean isShowText()
+	{
+		if (fieldTable == null) return false;
+		int n = fieldTable.getRowCount();
+		if (n > 3) 
+			return (Boolean) fieldTable.getModel().getValueAt(SHOW_TEXT_ROW, 1);
+		return false;
+	}
+	
+
+	/**
+	 * Returns <code>true</code> if the measurement has to be shown, 
+	 * <code>false</code> otherwise.
+	 * 
+	 * @return See above.
+	 */
+	boolean isShowMeasurement()
+	{
+		if (fieldTable == null) return false;
+		int n = fieldTable.getRowCount();
+		if (n > 4) 
+			return (Boolean) fieldTable.getModel().getValueAt(
+					SHOW_MEASUREMENT_ROW, 1);
+		return false;
+	}
+	
+	
 	/**
 	 * Sets the data.
 	 * 
