@@ -206,7 +206,7 @@ public class RoiI extends AbstractAmdServant implements _IRoiOperations,
 
             @Transactional(readOnly = true)
             public Object doWork(Session session, ServiceFactory sf) {
-                List<Long> shapesInRoi = sql.getShapeIds(roiId);
+                List<Long> shapesInRoi = getSqlAction().getShapeIds(roiId);
                 return geomTool.getStats(shapesInRoi);
             }
         }));

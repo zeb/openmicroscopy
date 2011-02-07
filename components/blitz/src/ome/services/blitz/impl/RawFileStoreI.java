@@ -10,7 +10,6 @@ package ome.services.blitz.impl;
 import ome.api.RawFileStore;
 import ome.services.blitz.util.BlitzExecutor;
 import ome.services.blitz.util.ServiceFactoryAware;
-import ome.services.blitz.util.TieAware;
 import ome.services.util.Executor;
 import ome.util.SqlAction;
 import omero.ServerError;

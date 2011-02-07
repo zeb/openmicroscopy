@@ -29,7 +29,6 @@
 		</description>
         <constructor-arg index="0" ref="roleProvider"/>
         <constructor-arg index="1" ref="ldapTemplate" />
-        <constructor-arg index="2" ref="simpleJdbcTemplate" />
         <constructor-arg index="2" ref="simpleSqlAction"/>
         <constructor-arg index="3" value="${omero.ldap.new_user_group}" />
         <constructor-arg index="4" value="${omero.ldap.groups}" />

@@ -21,6 +21,7 @@ import ome.services.blitz.fire.Registry;
 import ome.services.util.Executor;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
+import ome.util.SqlAction;
 import omero.ServerError;
 import omero.api.RawFileStorePrx;
 import omero.api.RawPixelsStorePrx;
@@ -61,7 +62,7 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
 
     private final FileMaker fileMaker;
 
-    private OriginalFile description;
+    private OriginalFile _description;
 
     private RepositoryPrx proxy;
 
@@ -143,7 +144,7 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
     }
 
     public OriginalFile getDescription(Current __current) {
-        return description;
+        return _description;
     }
 
     public RepositoryPrx getProxy(Current __current) {
@@ -160,19 +161,16 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
             throw new omero.ValidationException(null, null, "Unmanaged file");
         }
 
-        Integer count = (Integer) ex
-                .executeStateless(new Executor.SimpleStatelessWork(this,
+        Boolean inRepository = (Boolean) ex
+                .executeSql(new Executor.SimpleSqlWork(this,
                         "getFileUrl") {
                     @Transactional(readOnly = true)
-                    public Object doWork(SimpleJdbcOperations jdbc) {
-                        return jdbc.queryForInt(
-                                "select count(*) from originalfile "
-                                        + "where id = ? and url is null", file
-                                        .getId().getValue());
+                    public Object doWork(SqlAction sql) {
+                        return sql.getOriginalFileHasUrl(file.getId().getValue());
                     }
                 });
 
-        if (count.intValue() == 0) {
+        if (inRepository) {
             throw new omero.ValidationException(null, null,
                     "Does not belong to this repository");
         }
@@ -252,7 +250,7 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
                     r.setSize(0L);
                     r.getDetails().setPermissions(Permissions.WORLD_IMMUTABLE);
                     r = sf.getUpdateService().saveAndReturnObject(r);
-                    description = new OriginalFileI(r.getId(), false);
+                    _description = new OriginalFileI(r.getId(), false);
                     fileMaker.writeLine(repoUuid);
                     log.info("Registered new repository: " + repoUuid);
                 } else {
@@ -273,7 +271,7 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
                             sf.getUpdateService().saveObject(r);
                         }
                     }
-                    description = new OriginalFileI(r.getId(), false);
+                    _description = new OriginalFileI(r.getId(), false);
                     log.info("Opened repository: " + repoUuid);
                 }
 
@@ -281,7 +279,7 @@ public class LegacyRepositoryI extends _InternalRepositoryDisp {
                 // Servants
                 //
 
-                PublicRepositoryI pr = new PublicRepositoryI(description
+                PublicRepositoryI pr = new PublicRepositoryI(_description
                         .getId().getValue(), ex, p);
 
                 Ice.ObjectPrx internalObj = addOrReplace("InternalRepository-", repo);

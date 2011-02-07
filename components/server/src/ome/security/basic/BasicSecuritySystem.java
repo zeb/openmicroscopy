@@ -51,6 +51,7 @@ import ome.tools.hibernate.SecurityFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
+import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -218,7 +219,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         filter.setParameter(SecurityFilter.is_share, share01); // ticket:2219, not checking -1 here.
         filter.setParameter(SecurityFilter.is_admin, admin01);
         filter.setParameter(SecurityFilter.current_user, ec.getCurrentUserId());
-        filter.setParameterList(SecurityFilter.current_groups, ec.getMemberOfGroupsList();
+        filter.setParameterList(SecurityFilter.current_groups, ec.getMemberOfGroupsList());
         filter.setParameterList(SecurityFilter.leader_of_groups, ec.getLeaderOfGroupsList());
     }
 

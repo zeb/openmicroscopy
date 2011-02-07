@@ -11,11 +11,10 @@ import java.security.Permissions;
 
 import ome.api.local.LocalLdap;
 import ome.conditions.ApiUsageException;
-import ome.security.LdapUtil;
 import ome.security.PasswordUtil;
 import ome.security.SecuritySystem;
+import ome.util.SqlAction;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.util.Assert;
 
 /**
@@ -38,23 +37,23 @@ public class LdapPasswordProvider extends ConfigurablePasswordProvider {
 
     final protected LocalLdap ldap;
 
-    final protected SimpleJdbcOperations jdbc;
+    final protected SqlAction sql;
 
-    public LdapPasswordProvider(LocalLdap ldap, SimpleJdbcOperations jdbc) {
+    public LdapPasswordProvider(LocalLdap ldap, SqlAction sql) {
         super();
         Assert.notNull(ldap);
-        Assert.notNull(jdbc);
+        Assert.notNull(sql);
         this.ldap = ldap;
-        this.jdbc = jdbc;
+        this.sql = sql;
     }
 
-    public LdapPasswordProvider(LocalLdap ldap, SimpleJdbcOperations jdbc,
+    public LdapPasswordProvider(LocalLdap ldap, SqlAction sql,
             boolean ignoreUnknown) {
         super(ignoreUnknown);
         Assert.notNull(ldap);
-        Assert.notNull(jdbc);
+        Assert.notNull(sql);
         this.ldap = ldap;
-        this.jdbc = jdbc;
+        this.sql = sql;
     }
 
     /**
@@ -67,9 +66,9 @@ public class LdapPasswordProvider extends ConfigurablePasswordProvider {
     @Override
     public boolean hasPassword(String user) {
         if (ldap.getSetting()) {
-            Long id = PasswordUtil.userId(jdbc, user);
+            Long id = PasswordUtil.userId(sql, user);
             if (id != null) {
-                String dn = LdapUtil.lookupLdapAuthExperimenter(jdbc, id);
+                String dn = sql.dnForUser(id);
                 if (dn != null) {
                     return true;
                 }
@@ -85,7 +84,7 @@ public class LdapPasswordProvider extends ConfigurablePasswordProvider {
             return null; // EARLY EXIT!
         }
 
-        Long id = PasswordUtil.userId(jdbc, user);
+        Long id = PasswordUtil.userId(sql, user);
 
         // Unknown user. First try to create.
         if (null == id) {
@@ -105,7 +104,7 @@ public class LdapPasswordProvider extends ConfigurablePasswordProvider {
         // Known user
         else {
             try {
-                String dn = LdapUtil.lookupLdapAuthExperimenter(jdbc, id);
+                String dn = sql.dnForUser(id);
                 if (dn != null) {
                     return ldap.validatePassword(dn, password);
                 }
