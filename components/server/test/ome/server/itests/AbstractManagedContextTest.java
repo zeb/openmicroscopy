@@ -100,8 +100,6 @@ public class AbstractManagedContextTest extends
 
     protected OMEData data;
 
-    protected SimpleJdbcTemplate jdbcTemplate;
-
     protected LdapTemplate ldapTemplate;
 
     protected HibernateTemplate hibernateTemplate;
@@ -125,8 +123,6 @@ public class AbstractManagedContextTest extends
 
         DataSource dataSource = (DataSource) applicationContext
                 .getBean("dataSource");
-        jdbcTemplate = (SimpleJdbcTemplate) applicationContext
-                .getBean("simpleJdbcTemplate");
 
         ldapTemplate = (LdapTemplate) applicationContext
                 .getBean("ldapTemplate");

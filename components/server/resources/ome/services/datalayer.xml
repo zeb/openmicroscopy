@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+       xmlns:util="http://www.springframework.org/schema/util"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.0.xsd"
        default-lazy-init="true">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,18 +83,38 @@
     <property name="dataSource" ref="dataSource"/>
   </bean>
 
-  <bean id="simpleJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+  <!-- Properties and actions: chooses between concrete implementations for
+       all JDBC calls -->
+
+  <alias alias="simpleSqlAction" name="sqlActionWrapper"/>
+
+  <bean id="loggingSqlAction" class="ome.util.SqlAction$LoggingSqlAction"/>
+
+  <bean id="sqlActionWrapper" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="interceptorNames">
+      <list>
+        <value>loggingSqlAction</value>
+      </list>
+    </property>
+    <property name="proxyInterfaces">
+      <list>
+        <value>ome.util.SqlAction</value>
+      </list>
+    </property>
+    <property name="target" ref="simpleSqlActionImpl"/>
+  </bean>
+
+  <bean id="simpleSqlActionImpl" class="${omero.db.sql_action_class}">
     <description>
     Takes part in any currently running Hibernate transaction.
+    Where necessary, implementations can using PROPAGATION
+    settings to temporarily run in an autonomous transaction.
     </description>
-    <constructor-arg ref="dataSource"/>
-  </bean>
-  
-  <bean id="isolatedJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
-    <description>
-    Provides JDBC access WITHOUT taking part in Hibernate transactions
-    </description>
-    <constructor-arg ref="selfCorrectingDataSource"/>
+    <constructor-arg>
+      <bean class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+      </bean>
+    </constructor-arg>
   </bean>
 
   <!--
@@ -111,20 +134,26 @@
     <constructor-arg value="300000"/> <!--5 minutes of errors -->
   </bean>
 
+  <alias alias="dataSourceProperties" name="${omero.db.profile}DataSourceProperties"/>
+
+  <bean id="psqlDataSourceProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <property name="properties">
+      <props>
+        <prop key="driverClassName">${omero.db.driver}</prop>
+        <prop key="url">jdbc:postgresql://${omero.db.host}:${omero.db.port}/${omero.db.name}</prop>
+        <prop key="user">${omero.db.user}</prop>
+        <prop key="password">${omero.db.pass}</prop>
+      </props>
+    </property>
+  </bean>
+
   <bean id="nonXaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource">
     <property name="className" value="bitronix.tm.resource.jdbc.lrc.LrcXADataSource"/>
     <property name="uniqueName" ref="uuid"/>
     <property name="maxPoolSize" value="${omero.db.poolsize}"/>
     <!-- NPE ?? property name="loginTimeout" value="5" -->
     <property name="allowLocalTransactions" value="true"/>
-    <property name="driverProperties">
-      <props>
-        <prop key="driverClassName">org.postgresql.Driver</prop>
-        <prop key="url">jdbc:postgresql://${omero.db.host}:${omero.db.port}/${omero.db.name}</prop>
-        <prop key="user">${omero.db.user}</prop>
-        <prop key="password">${omero.db.pass}</prop>
-      </props>
-    </property>
+    <property name="driverProperties" ref="dataSourceProperties"/>
   </bean>
 
   <!--
@@ -140,6 +169,10 @@
     <property name="borrowConnectionTimeout" value="5"/>
   </bean>
   -->
+
+  <alias alias="lobHandler" name="${omero.db.lob_handler}"/>
+
+  <bean id="org.springframework.jdbc.support.lob.DefaultLobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 
 </beans>
 

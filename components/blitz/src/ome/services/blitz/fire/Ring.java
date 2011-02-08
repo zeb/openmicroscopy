@@ -21,6 +21,7 @@ import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
+import ome.util.SqlAction;
 import omero.grid.ClusterNodePrx;
 import omero.grid.ClusterNodePrxHelper;
 import omero.grid._ClusterNodeDisp;
@@ -29,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.transaction.annotation.Transactional;
 
 import Glacier2.CannotCreateSessionException;
@@ -256,16 +256,11 @@ public class Ring extends _ClusterNodeDisp implements Redirector.Context {
      * session, then the cluster has no extra information.
      */
     public boolean checkPassword(final String userId) {
-        return (Boolean) executor
-                .executeStateless(new Executor.SimpleStatelessWork(this,
+        return (Boolean) executor.executeSql(new Executor.SimpleSqlWork(this,
                         "checkPassword") {
                     @Transactional(readOnly = true)
-                    public Object doWork(SimpleJdbcOperations jdbc) {
-                        int count = jdbc.queryForInt(
-                                "select count(id) from session s "
-                                        + "where s.closed is null "
-                                        + "and s.uuid = ?", userId);
-                        return count > 0;
+                    public Object doWork(SqlAction sql) {
+                        return sql.activeSession(userId);
                     }
                 });
     }
@@ -354,18 +349,12 @@ public class Ring extends _ClusterNodeDisp implements Redirector.Context {
     @SuppressWarnings("unchecked")
     private int closeSessionsForManager(final String managerUuid) {
 
-        final String sql = "update Session set closed = now() where "
-                + "closed is null and node in "
-                + "(select id from Node where uuid = :uuid)";
-
         // First look up the sessions in on transaction
         return (Integer) executor.execute(principal, new Executor.SimpleWork(
                 this, "executeUpdate - set closed = now()") {
             @Transactional(readOnly = false)
             public Object doWork(Session session, ServiceFactory sf) {
-                Query q = session.createSQLQuery(sql);
-                q.setParameter("uuid", managerUuid);
-                return q.executeUpdate();
+                return getSqlAction().closeNodeSessions(managerUuid);
             }
         });
     }
@@ -375,10 +364,7 @@ public class Ring extends _ClusterNodeDisp implements Redirector.Context {
                 "setManagerDown") {
             @Transactional(readOnly = false)
             public Object doWork(Session session, ServiceFactory sf) {
-                Query q = session.createSQLQuery("update Node set down = now()" +
-                		" where uuid = :uuid");
-                q.setParameter("uuid", managerUuid);
-                return q.executeUpdate();
+                return getSqlAction().closeNode(managerUuid);
             }
         });
     }

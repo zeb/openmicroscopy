@@ -38,6 +38,7 @@
         <bean class="ome.services.blitz.impl.RoiI">
             <constructor-arg ref="throttlingStrategy"/>
             <constructor-arg ref="geomTool"/>
+            <constructor-arg ref="simpleSqlAction"/>
         </bean>
     </constructor-arg>
   </bean>
@@ -47,7 +48,7 @@
   </bean>
   <bean id="geomTool" class="ome.services.roi.GeomTool" lazy-init="false">
       <constructor-arg ref="roiPixData"/>
-      <constructor-arg ref="simpleJdbcTemplate"/>
+      <constructor-arg ref="simpleSqlAction"/>
       <constructor-arg ref="omeroSessionFactory"/>
       <constructor-arg ref="executor"/>
       <constructor-arg ref="uuid"/>
@@ -56,19 +57,6 @@
       <constructor-arg ref="internal-ome.api.IPixels"/>
       <constructor-arg ref="/OMERO/Pixels"/>
   </bean>
-  <bean id="pgGeomRun" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-    <property name="targetObject" ref="geomTool" />
-    <property name="targetMethod" value="backgroundSynchronizeShapeGeometries" />
-    <property name="concurrent"   value="false"/>
-  </bean>
-  <bean id="pgGeomTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-    <description>
-    Runs periodically to give fill the pg_geom column of the Shape table.
-    </description>
-    <property name="jobDetail" ref="pgGeomRun" />
-    <property name="repeatInterval" value="60000" /><!-- millis -->
-  </bean>
-
 
   <bean id="omero.api.IScript" class="omero.api._IScriptTie" singleton="false">
     <constructor-arg>

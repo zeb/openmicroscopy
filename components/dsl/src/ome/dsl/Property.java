@@ -9,6 +9,8 @@ package ome.dsl;
 
 // Java imports
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -272,8 +274,14 @@ public abstract class Property { // TODO need to define equality so that two
      * Read-only variable
      */
     public String getTypeAnnotation() {
+        String T = "@org.hibernate.annotations.Type";
+        String P = ", parameters=@org.hibernate.annotations.Parameter(name=\"profile\", value=\"@PROFILE@\"))";
         if (type.equals("text")) {
-            return "@org.hibernate.annotations.Type(type=\"org.hibernate.type.TextType\")";
+            return T + "(type=\"org.hibernate.type.TextType\")";
+        } else if (type.equals("string[]")) {
+            return T + "(type=\"ome.tools.hibernate.ListAsSQLArrayUserType$STRING\"" + P;
+        } else if (type.equals("string[][]")) {
+            return T + "(type=\"ome.tools.hibernate.ListAsSQLArrayUserType$STRING2\"" + P;
         } else {
             return "// No @Type annotation";
         }

@@ -13,6 +13,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
+  <properties file="${ivy.settings.dir}/local.properties.example"/>
   <properties file="${ivy.settings.dir}/local.properties"/>
   <settings defaultResolver="${omero.resolver}"/>
   <caches defaultCacheDir="${ivy.settings.dir}/../lib/cache"/>

@@ -105,6 +105,7 @@
 
   <bean id="omeroSessionFactory" class="ome.tools.hibernate.SessionFactory">
     <constructor-arg ref="sessionFactory"/>
+    <constructor-arg ref="simpleSqlAction"/><!-- Used for ome_nextval -->
   </bean>
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -123,6 +124,7 @@
             <ref bean="securityFilter"/>
         </list>
     </property>
+    <property name="lobHandler" ref="lobHandler"/>
   </bean>
 
 </beans>

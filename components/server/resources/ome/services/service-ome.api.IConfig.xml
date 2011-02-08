@@ -48,7 +48,7 @@
     The implementation of our interface. Provided with a JDBC template for 
     accessing the database time. Safe to use ONLY from within another service!
     </description>
-    <property name="jdbcTemplate" ref="simpleJdbcTemplate"/>
+    <property name="sqlAction" ref="simpleSqlAction"/>
     <property name="preferenceContext" ref="preferenceContext"/>
     <property name="currentDetails" ref="currentDetails"/>
   </bean>

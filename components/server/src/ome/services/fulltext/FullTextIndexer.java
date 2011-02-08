@@ -17,9 +17,10 @@ import ome.model.IGlobal;
 import ome.model.IMutable;
 import ome.model.IObject;
 import ome.model.meta.EventLog;
-import ome.services.util.Executor.Work;
+import ome.services.util.Executor.SimpleWork;
 import ome.system.ServiceFactory;
 import ome.tools.hibernate.QueryBuilder;
+import ome.util.SqlAction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
  */
-public class FullTextIndexer implements Work {
+public class FullTextIndexer extends SimpleWork {
 
     private final static Log log = LogFactory.getLog(FullTextIndexer.class);
 
@@ -103,18 +104,26 @@ public class FullTextIndexer implements Work {
     }
 
     public FullTextIndexer(EventLogLoader ll) {
+        super("FullTextIndexer", "index");
         this.loader = ll;
     }
 
-    public String description() {
-        return "FullTextIndexer";
+    /**
+     * Since these instances are used repeatedly, we need to check for
+     * already set SqlAction
+     */
+    @Override
+    public synchronized void setSqlAction(SqlAction sql) {
+        if (getSqlAction() == null) {
+            super.setSqlAction(sql);
+        }
     }
 
     /**
      * Runs {@link #doIndexing(FullTextSession)} within a Lucene transaction.
      * {@link #doIndexing(FullTextSession)} will also be called
      */
-    @Transactional(readOnly = false, isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
     public Object doWork(Session session, ServiceFactory sf) {
         int count = 1;
         int perbatch = 0;
@@ -124,12 +133,8 @@ public class FullTextIndexer implements Work {
             // ticket:1254 -
             // The following is non-portable and can later be refactored
             // for a more general solution.
-            session.doWork(new org.hibernate.jdbc.Work() {
-                public void execute(Connection connection) throws SQLException {
-                    Statement s = connection.createStatement();
-                    s.execute("set constraints all deferred;");
-                }
-            });
+            getSqlAction().deferConstraints();
+
             // s.execute("set statement_timeout=10000");
             // The Postgresql Driver does not currently support the
             // "timeout" value on @Transactional and so if a query timeout

@@ -26,8 +26,8 @@
     Privileged bean which has several "private" references injected. This is not
     an example of what should be done.
     </description>
-    <constructor-arg ref="simpleJdbcTemplate"/>
-    <constructor-arg ref="sessionFactory"/>
+    <constructor-arg ref="simpleSqlAction"/>
+    <constructor-arg ref="omeroSessionFactory"/>
     <constructor-arg ref="mailSender"/>
     <constructor-arg ref="templateMessage"/>
     <constructor-arg ref="aclVoter"/>

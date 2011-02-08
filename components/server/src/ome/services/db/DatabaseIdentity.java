@@ -7,6 +7,8 @@
 
 package ome.services.db;
 
+import ome.util.SqlAction;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

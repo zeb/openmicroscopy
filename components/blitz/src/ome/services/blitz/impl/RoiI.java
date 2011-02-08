@@ -26,15 +26,13 @@ import ome.system.ServiceFactory;
 import ome.tools.hibernate.QueryBuilder;
 import omero.InternalException;
 import omero.ServerError;
-import omero.api.AMD_IRoi_findByAnyIntersection;
 import omero.api.AMD_IRoi_findByImage;
-import omero.api.AMD_IRoi_findByIntersection;
 import omero.api.AMD_IRoi_findByPlane;
 import omero.api.AMD_IRoi_findByRoi;
-import omero.api.AMD_IRoi_getRoiMeasurements;
 import omero.api.AMD_IRoi_getMeasuredRois;
 import omero.api.AMD_IRoi_getMeasuredRoisMap;
 import omero.api.AMD_IRoi_getPoints;
+import omero.api.AMD_IRoi_getRoiMeasurements;
 import omero.api.AMD_IRoi_getRoiStats;
 import omero.api.AMD_IRoi_getShapeStats;
 import omero.api.AMD_IRoi_getShapeStatsList;
@@ -79,61 +77,6 @@ public class RoiI extends AbstractAmdServant implements _IRoiOperations,
 
     // ~ Service methods
     // =========================================================================
-
-    public void findByIntersection_async(AMD_IRoi_findByIntersection __cb,
-            final long imageId, final Shape shape, final RoiOptions opts,
-            Current __current) throws ServerError {
-
-        final IceMapper mapper = new RoiResultMapper(opts);
-
-        runnableCall(__current, new Adapter(__cb, __current, mapper, factory
-                .getExecutor(), factory.principal, new SimpleWork(this,
-                "findByIntersection", imageId, shape) {
-
-            @Transactional(readOnly = true)
-            public Object doWork(Session session, ServiceFactory sf) {
-                List<Long> roiIds = geomTool.findIntersectingRois(imageId,
-                        opts, shape);
-                if (roiIds == null || roiIds.size() == 0) {
-                    return null;
-                } else {
-                    RoiQueryBuilder qb = new RoiQueryBuilder(roiIds);
-                    return qb.query(session).list();
-                }
-            }
-        }));
-    }
-
-    public void findByAnyIntersection_async(
-            AMD_IRoi_findByAnyIntersection __cb, final long imageId,
-            final List<Shape> shapes, final RoiOptions opts, Current __current)
-            throws ServerError {
-
-        final IceMapper mapper = new RoiResultMapper(opts);
-
-        runnableCall(__current, new Adapter(__cb, __current, mapper, factory
-                .getExecutor(), factory.principal, new SimpleWork(this,
-                "findByAnyIntersection", imageId, shapes) {
-
-            @Transactional(readOnly = true)
-            public Object doWork(Session session, ServiceFactory sf) {
-
-                if (shapes == null || shapes.size() == 0) {
-                    return null; // EARLY EXIT
-                }
-
-                List<Long> roiIds = geomTool.findIntersectingRois(imageId,
-                        opts, shapes.toArray(new Shape[shapes.size()]));
-                if (roiIds == null || roiIds.size() == 0) {
-                    return null;
-                } else {
-                    RoiQueryBuilder qb = new RoiQueryBuilder(roiIds);
-                    return qb.query(session).list();
-                }
-            }
-        }));
-
-    }
 
     public void findByImage_async(AMD_IRoi_findByImage __cb,
             final long imageId, RoiOptions opts, Current __current)
@@ -263,7 +206,7 @@ public class RoiI extends AbstractAmdServant implements _IRoiOperations,
 
             @Transactional(readOnly = true)
             public Object doWork(Session session, ServiceFactory sf) {
-                List<Long> shapesInRoi = geomTool.getShapeIds(roiId);
+                List<Long> shapesInRoi = sql.getShapeIds(roiId);
                 return geomTool.getStats(shapesInRoi);
             }
         }));
