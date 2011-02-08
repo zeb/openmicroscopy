@@ -106,50 +106,15 @@ public class EventHandler implements MethodInterceptor {
         }
 
         // ticket:1254
-<<<<<<< HEAD
-        Session session = factory.getSession();
-        session.doWork(new Work(){
-            public void execute(Connection connection) throws SQLException {
-                Statement statement = connection.createStatement();
-                statement.execute("set constraints all deferred;");
-            }});
-        
-        secSys.loadEventContext(readOnly, isClose);
-        
-||||||| merged common ancestors
-        Session session = factory.getSession();
-        Statement statement = session.connection().createStatement();
-        statement.execute("set constraints all deferred;");
-        
-        secSys.loadEventContext(readOnly, isClose);
-        
-=======
->>>>>>> feature/4241
         // and ticket:1266
         final Session session = factory.getSession();
 
         if (!readOnly) {
-<<<<<<< HEAD
-            session.doWork(new Work(){
-                public void execute(Connection connection) throws SQLException {
-                    connection.createStatement().execute("COMMIT;");
-                    // Not calling BEGIN since it is inserted automatically.
-                }});
-||||||| merged common ancestors
-            statement.execute("COMMIT;");
-            statement.execute("BEGIN");
-=======
             sql.deferConstraints();
->>>>>>> feature/4241
         }
-<<<<<<< HEAD
-
-||||||| merged common ancestors
-=======
 
         secSys.loadEventContext(readOnly, isClose);
 
->>>>>>> feature/4241
         // now the user can be considered to be logged in.
         EventContext ec = secSys.getEventContext();
         if (log.isInfoEnabled()) {

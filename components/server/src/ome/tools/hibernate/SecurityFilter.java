@@ -57,13 +57,17 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
 
     static private String defaultFilterCondition;
 
+    static Map<String, String> parameterTypes() {
+        Map<String, String> parameterTypes = new HashMap<String, String>();
+        parameterTypes.put(is_share, "int");
+        parameterTypes.put(is_admin, "int");
+        parameterTypes.put(current_user, "long");
+        parameterTypes.put(current_groups, "long");
+        parameterTypes.put(leader_of_groups, "long");
+        return parameterTypes;
+    }
 
     static {
-        parameterTypes.setProperty(is_share, "java.lang.Boolean");
-        parameterTypes.setProperty(is_admin, "java.lang.Boolean");
-        parameterTypes.setProperty(current_user, "long");
-        parameterTypes.setProperty(current_groups, "long");
-        parameterTypes.setProperty(leader_of_groups, "long");
         // This can't be done statically because we need the securitySystem.
         defaultFilterCondition = String.format("\n( "
                 + "\n 1 = :is_share OR \n 1 = :is_admin OR "
@@ -88,7 +92,7 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
      */
     public SecurityFilter() {
         this.setFilterName(filterName);
-        this.setParameterTypes(parameterTypes);
+        this.setParameterTypes(parameterTypes());
         this.setDefaultFilterCondition(defaultFilterCondition);
     }
 
