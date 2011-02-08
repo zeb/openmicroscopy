@@ -11,8 +11,8 @@ import java.security.Permissions;
 
 import ome.security.PasswordUtil;
 import ome.security.SecuritySystem;
+import ome.util.SqlAction;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.util.Assert;
 
 /**
@@ -25,23 +25,23 @@ import org.springframework.util.Assert;
 
 public class JdbcPasswordProvider extends ConfigurablePasswordProvider {
 
-    final protected SimpleJdbcOperations jdbc;
+    final protected SqlAction sql;
 
-    public JdbcPasswordProvider(SimpleJdbcOperations jdbc) {
+    public JdbcPasswordProvider(SqlAction sql) {
         super();
-        Assert.notNull(jdbc);
-        this.jdbc = jdbc;
+        Assert.notNull(sql);
+        this.sql = sql;
     }
 
-    public JdbcPasswordProvider(SimpleJdbcOperations jdbc, boolean ignoreUnknown) {
+    public JdbcPasswordProvider(SqlAction sql, boolean ignoreUnknown) {
         super(ignoreUnknown);
-        Assert.notNull(jdbc);
-        this.jdbc = jdbc;
+        Assert.notNull(sql);
+        this.sql = sql;
     }
 
     @Override
     public boolean hasPassword(String user) {
-        Long id = PasswordUtil.userId(jdbc, user);
+        Long id = PasswordUtil.userId(sql, user);
         return id != null;
     }
 
@@ -52,7 +52,7 @@ public class JdbcPasswordProvider extends ConfigurablePasswordProvider {
      */
     @Override
     public Boolean checkPassword(String user, String password) {
-        Long id = PasswordUtil.userId(jdbc, user);
+        Long id = PasswordUtil.userId(sql, user);
 
         // If user doesn't exist, use the default settings for
         // #ignoreUknown.
@@ -60,7 +60,7 @@ public class JdbcPasswordProvider extends ConfigurablePasswordProvider {
         if (id == null) {
             return super.checkPassword(user, password);
         } else {
-            String trusted = PasswordUtil.getUserPasswordHash(jdbc, id);
+            String trusted = PasswordUtil.getUserPasswordHash(sql, id);
             return comparePasswords(trusted, password);
         }
     }
@@ -68,11 +68,11 @@ public class JdbcPasswordProvider extends ConfigurablePasswordProvider {
     @Override
     public void changePassword(String user, String password)
             throws PasswordChangeException {
-        Long id = PasswordUtil.userId(jdbc, user);
+        Long id = PasswordUtil.userId(sql, user);
         if (id == null) {
             throw new PasswordChangeException("Couldn't find id");
         }
-        PasswordUtil.changeUserPasswordById(jdbc, id, password);
+        PasswordUtil.changeUserPasswordById(sql, id, password);
     }
 
 }

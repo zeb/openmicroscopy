@@ -322,16 +322,7 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
     @PermitAll
     // see above
     public String getDatabaseUuid() {
-        return jdbc.query(
-                "select value from configuration where name = 'omero.db.uuid' ",
-                new ParameterizedRowMapper<String>() {
-                    public String mapRow(ResultSet arg0, int arg1)
-                            throws SQLException {
-                        String s = arg0.getString("value");
-                        return s;
-                    }
-
-                }).get(0);
+        return sql.dbUuid();
     }
 
     // Helpers

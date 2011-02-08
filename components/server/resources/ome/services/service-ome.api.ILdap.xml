@@ -29,7 +29,6 @@
 		</description>
         <constructor-arg index="0" ref="roleProvider"/>
         <constructor-arg index="1" ref="ldapTemplate" />
-        <constructor-arg index="2" ref="simpleJdbcTemplate" />
         <constructor-arg index="2" ref="simpleSqlAction"/>
         <constructor-arg index="3" value="${omero.ldap.new_user_group}" />
         <constructor-arg index="4" value="${omero.ldap.groups}" />
@@ -54,9 +53,9 @@
 
 	<bean id="contextSource"
 		class="ome.security.SecureLdapContextSource">
-		<property name="urls" value="${omero.ldap.urls}" />
+		<constructor-arg value="${omero.ldap.urls}"/>
 		<property name="protocol" value="${omero.ldap.protocol}" />
-		<property name="userName" value="${omero.ldap.username}" />
+		<property name="userDn" value="${omero.ldap.username}" />
 		<property name="password" value="${omero.ldap.password}" />
 		<property name="base" value="${omero.ldap.base}" />
 		<property name="dirObjectFactory"

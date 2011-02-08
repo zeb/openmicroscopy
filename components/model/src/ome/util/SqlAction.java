@@ -246,6 +246,12 @@ public interface SqlAction {
     // End PgArrayHelper
     //
 
+    //
+    // 4.1 ONLY
+    //
+    //
+    boolean getOriginalFileHasUrl(long id);
+
     /**
      * Base implementation which can be used
      */
@@ -334,6 +340,11 @@ public interface SqlAction {
             _jdbc().update(
                 _lookup("log_loader_delete"), key); //$NON-NLS-1$
 
+        }
+
+        public boolean getOriginalFileHasUrl(long id) { //$NON-NLS-1$
+            return _jdbc().queryForInt(
+                _lookup("file_has_url")) > 0;
         }
     }
 

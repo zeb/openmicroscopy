@@ -16,14 +16,12 @@ import java.util.Random;
 
 import ome.conditions.ApiUsageException;
 import ome.conditions.InternalException;
+import ome.util.SqlAction;
 import ome.util.Utils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 
 /**
  * Static methods for dealing with password hashes and the "password" table.
@@ -66,70 +64,25 @@ public abstract class PasswordUtil {
         return buffer.toString();
     }
 
-    public static String getDnById(SimpleJdbcOperations jdbc, Long id) {
-        String expire;
-        try {
-            expire = jdbc.queryForObject("select dn from password "
-                    + "where experimenter_id = ? ", String.class, id);
-        } catch (EmptyResultDataAccessException e) {
-            expire = null; // This means there's not one.
-        }
-        return expire;
+    public static String getDnById(SqlAction sql, Long id) {
+        return sql.dnForUser(id);
     }
 
-    public static void changeUserPasswordById(SimpleJdbcOperations jdbc,
+    public static void changeUserPasswordById(SqlAction sql,
             Long id, String password) {
-        int results = jdbc.update("update password set hash = ? "
-                + "where experimenter_id = ? ", preparePassword(password), id);
-        if (results < 1) {
-            results = jdbc.update("insert into password values (?,?) ", id,
-                    preparePassword(password));
-            if (results < 1) {
-                throw new InternalException("0 results for password insert.");
-            }
-        }
+        sql.setUserPassword(id, password);
     }
 
-    public static String getUserPasswordHash(SimpleJdbcOperations jdbc, Long id) {
-        String stored;
-        try {
-            stored = jdbc.queryForObject("select hash "
-                    + "from password where experimenter_id = ? ", String.class,
-                    id);
-        } catch (EmptyResultDataAccessException e) {
-            stored = null; // This means there's not one.
-        }
-        return stored;
+    public static String getUserPasswordHash(SqlAction sql, Long id) {
+        return sql.getPasswordHash(id);
     }
 
-    public static Long userId(SimpleJdbcOperations jdbc, String name) {
-        Long id;
-        try {
-            id = jdbc.queryForObject(
-                    "select id from experimenter where omeName = ?",
-                    Long.class, name);
-        } catch (EmptyResultDataAccessException e) {
-            id = null; // This means there's not one.
-        }
-        return id;
+    public static Long userId(SqlAction sql, String name) {
+        return sql.getUserId(name);
     }
 
-    public static List<String> userGroups(SimpleJdbcOperations jdbc, String name) {
-        List<String> roles;
-        try {
-            roles = jdbc.query("select g.name from experimentergroup g, "
-                    + "groupexperimentermap m, experimenter e "
-                    + "where omeName = ? and " + "e.id = m.child and "
-                    + "m.parent = g.id", new ParameterizedRowMapper<String>() {
-                public String mapRow(ResultSet rs, int rowNum)
-                        throws SQLException {
-                    return rs.getString(1);
-                }
-            }, name);
-        } catch (EmptyResultDataAccessException e) {
-            roles = null; // This means there's not one.
-        }
-        return roles == null ? new ArrayList<String>() : roles;
+    public static List<String> userGroups(SqlAction sql, String name) {
+        return sql.getUserGroups(name);
     }
 
     public static String preparePassword(String newPassword) {

@@ -38,7 +38,6 @@
         <bean class="ome.services.blitz.impl.RoiI">
             <constructor-arg ref="throttlingStrategy"/>
             <constructor-arg ref="geomTool"/>
-            <constructor-arg ref="simpleSqlAction"/>
         </bean>
     </constructor-arg>
   </bean>

@@ -36,7 +36,6 @@ import ome.conditions.SecurityViolation;
 import ome.model.internal.Permissions;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
-import ome.security.LdapUtil;
 import ome.security.SecuritySystem;
 import ome.security.auth.RoleProvider;
 import ome.system.OmeroContext;
@@ -79,9 +78,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RevisionNumber("$Revision: 1552 $")
 public class LdapImpl extends AbstractLevel2Service implements LocalLdap {
 
-    private final SqlAction sql;
+    protected final SqlAction sql;
 
-    protected final SimpleJdbcOperations jdbc;
+    protected final LdapOperations ldapOperations;
 
     protected final String newUserGroup;
 
@@ -96,7 +95,7 @@ public class LdapImpl extends AbstractLevel2Service implements LocalLdap {
     protected final RoleProvider roleProvider;
 
     public LdapImpl(RoleProvider roleProvider, LdapOperations ldapOperations,
-            SqlAction sql, String newUserGroup, 
+            SqlAction sql, String newUserGroup,
             String groups, String attributes, String values, boolean config) {
         this.roleProvider = roleProvider;
         this.ldapOperations = ldapOperations;
@@ -220,7 +219,7 @@ public class LdapImpl extends AbstractLevel2Service implements LocalLdap {
     @RolesAllowed("system")
     @Transactional(readOnly = false)
     public void setDN(Long experimenterID, String dn) {
-        LdapUtil.setDNById(jdbc, experimenterID, dn);
+        sql.setUserDn(experimenterID, dn);
     }
 
     // Getters and Setters for requiroments

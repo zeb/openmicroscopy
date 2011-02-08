@@ -177,14 +177,11 @@ public interface Executor extends ApplicationContextAware {
         Object doWork(SqlAction sql);
     }
 
-    /**
-     * Simple adapter which takes a String for {@link #description}
-     */
-    public abstract class SimpleWork implements Work {
+    public abstract class Descriptive {
 
-        final private String description;
+        final protected String description;
 
-        public SimpleWork(Object o, String method, Object...params) {
+        public Descriptive(Object o, String method, Object...params) {
             StringBuilder sb = new StringBuilder();
             sb.append(o.getClass().getName());
             sb.append(".");
@@ -208,6 +205,7 @@ public interface Executor extends ApplicationContextAware {
         public String description() {
             return description;
         }
+    }
 
     /**
      * Simple adapter which takes a String for {@link #description}

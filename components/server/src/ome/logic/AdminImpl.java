@@ -42,7 +42,6 @@ import ome.model.meta.ExperimenterGroup;
 import ome.parameters.Parameters;
 import ome.security.ACLVoter;
 import ome.security.AdminAction;
-import ome.security.LdapUtil;
 import ome.security.PasswordUtil;
 import ome.security.SecureAction;
 import ome.security.SecuritySystem;
@@ -297,12 +296,12 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @Transactional(readOnly = true)
     @RolesAllowed("user")
     public List<Map<String, Object>> lookupLdapAuthExperimenters() {
-        return LdapUtil.lookupLdapAuthExperimenters(jdbc);
+        return sql.dnExperimenterMaps();
     }
 
     @RolesAllowed("user")
     public String lookupLdapAuthExperimenter(long id) {
-        return LdapUtil.lookupLdapAuthExperimenter(jdbc, id);
+        return sql.dnForUser(id);
     }
 
     @RolesAllowed("user")
@@ -689,7 +688,8 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         // create a new session. It's important that we pass in the empty
         // interceptor here, otherwise even root wouldn't be allowed to unlock
         // the instance.
-        Session s = SessionFactoryUtils.getNewSession(sf,
+        Session tmp = osf.getSession();
+        Session s = SessionFactoryUtils.getNewSession(tmp.getSessionFactory(),
                 EmptyInterceptor.INSTANCE);
 
         // similarly, we need to disable certain backend systems. first we
@@ -845,7 +845,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     }
 
     private boolean isDnById(long id) {
-        String dn = PasswordUtil.getDnById(jdbc, id);
+        String dn = sql.dnForUser(id);
         if (dn != null) {
             return true;
         } else {
