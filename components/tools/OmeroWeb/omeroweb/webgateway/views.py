@@ -988,6 +988,7 @@ def imageMarshal (image, key=None):
     ds = image.getDataset()
     try:
         rv = {
+            'tiles': False, #BIG IMAGE -> True
             'id': image.id,
             'size': {'width': image.getWidth(),
                      'height': image.getHeight(),
