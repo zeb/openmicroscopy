@@ -38,7 +38,7 @@ public class MethodSecurityTest extends AbstractManagedContextTest {
         executor.execute(this.loginAop.p, new Executor.SimpleWork(this, "getRoles") {
             @Transactional(readOnly = true)
             public Object doWork(Session session, ServiceFactory sf) {
-            return PasswordUtil.userGroups(sql, "root");
+            return PasswordUtil.userGroups(getSqlAction(), "root");
                 }
         });
 
