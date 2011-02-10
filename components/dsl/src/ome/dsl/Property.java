@@ -134,6 +134,14 @@ public abstract class Property { // TODO need to define equality so that two
      * The {@link SemanticType} instance which this property points at
      */
     private SemanticType actualType;
+    
+    private final String profile;
+
+    /**
+     * The {@link SemanticType} instance which is the target of this property
+     * (for collections)
+     */
+    private SemanticType actualTarget;
 
     // String based values.
     private String name;
@@ -257,6 +265,14 @@ public abstract class Property { // TODO need to define equality so that two
 
     public SemanticType getActualType() {
         return this.actualType;
+    }
+
+    public void setActualTarget(SemanticType type) {
+        this.actualTarget = type;
+    }
+
+    public SemanticType getActualTarget() {
+        return this.actualTarget;
     }
 
     /**
@@ -462,6 +478,7 @@ public abstract class Property { // TODO need to define equality so that two
      * VALUES. Subclassees may override these values
      */
     public Property(SemanticType st, Properties attrs) {
+        this.profile = st.profile;
         setSt(st);
         setName(attrs.getProperty("name", null));
         setType(attrs.getProperty("type", null));
