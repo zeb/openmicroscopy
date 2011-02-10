@@ -33,7 +33,7 @@
        LIMIT 1;
 
       IF duplicate IS NOT NULL THEN
-          RAISE NOTICE ''Remapping ${tbl_name} % via (-1 - oldvalue )'', duplicate;
+          RAISE NOTICE ''Remapping ${tbl_name} %% via (-1 - oldvalue )'', duplicate;
           UPDATE ${tbl_name} SET ${col_name}_index = -1 - ${col_name}_index WHERE id = duplicate;
       END IF;
 
@@ -108,10 +108,6 @@ BEGIN
 
       RETURN nv;
 END;' LANGUAGE plpgsql;
-
-alter table seq_table
-    alter column sequence_name set not null,
-    add primary key (sequence_name);
 
 --
 -- First, we install a unique constraint so that it is only possible
