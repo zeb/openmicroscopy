@@ -347,21 +347,36 @@ class MeasurementViewerControl
     		public void mouseReleased(MouseEvent e)
     		{
     			setROIFigureStatus(ROIFigure.IDLE);
-    			if (isRightClick(e)) {
-    				Collection l = view.getDrawingView().getSelectedFigures();
-    				if (l != null && l.size() == 1)
-    					view.showROIManagementMenu(e.getX(), e.getY());
+    			if (!UIUtilities.isWindowsOS()) {
+        			if (isRightClick(e)) {
+        				Collection l = 
+        					view.getDrawingView().getSelectedFigures();
+        				if (l != null && l.size() == 1)
+        					view.showROIManagementMenu(e.getX(), e.getY());
+        			}
     			}
     		}
-
+    		
+    		public void mousePressed(MouseEvent e)
+    		{
+    			setROIFigureStatus(ROIFigure.IDLE);
+    			if (UIUtilities.isWindowsOS()) {
+        			if (isRightClick(e)) {
+        				Collection l = 
+        					view.getDrawingView().getSelectedFigures();
+        				if (l != null && l.size() == 1)
+        					view.showROIManagementMenu(e.getX(), e.getY());
+        			}
+    			}
+    		}
     	});
-
     	view.getDrawingView().addMouseMotionListener(new MouseMotionAdapter()
     	{
 
     		@Override
     		public void mouseDragged(MouseEvent e)
     		{
+    			if (isRightClick(e)) return;
     			setROIFigureStatus(ROIFigure.MOVING);
     		}
 
@@ -536,7 +551,6 @@ class MeasurementViewerControl
 	{
 		Figure f = e.getFigure();
 		if (!(f instanceof ROIFigure)) return;
-
 		ROIFigure roiFigure = (ROIFigure) f;
 		roiFigure.setStatus(ROIFigure.MOVING);
 		view.addROI(roiFigure);
