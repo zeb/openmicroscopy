@@ -7,7 +7,6 @@
 
 package ome.util.actions;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,16 +18,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ome.conditions.InternalException;
+import javax.sql.DataSource;
+
 import ome.util.SqlAction;
-import ome.util.SqlAction.IdRowMapper;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class PostgresSqlAction extends SqlAction.Impl {
 
@@ -36,6 +40,20 @@ public class PostgresSqlAction extends SqlAction.Impl {
 
     public PostgresSqlAction(SimpleJdbcOperations jdbc) {
         this.jdbc = jdbc;
+    }
+
+    /**
+     * 4.2+ uses PostgreSQL's native 'nextval' to implement ome_nextval,
+     * making the method transactionally safe. 4.1 doesn't.
+     */
+    private TransactionTemplate tx() {
+        DataSource ds = ((JdbcTemplate) jdbc.getJdbcOperations())
+                .getDataSource();
+        TransactionDefinition def = new DefaultTransactionDefinition(
+                DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionTemplate tt = new TransactionTemplate(
+                new DataSourceTransactionManager(ds), def);
+        return tt;
     }
 
     //
@@ -236,11 +254,14 @@ public class PostgresSqlAction extends SqlAction.Impl {
 
     }
 
-    public long nextValue(String segmentValue, int incrementSize) {
-        return jdbc.queryForLong(
-                PsqlStrings.getString("sql_action.next_val"), segmentValue, //$NON-NLS-1$
-                incrementSize);
-
+    public long nextValue(final String segmentValue, final int incrementSize) {
+        TransactionTemplate tx = tx();
+        return tx.execute(new TransactionCallback<Long>(){
+            public Long doInTransaction(TransactionStatus status) {
+                return jdbc.queryForLong(
+                        PsqlStrings.getString("sql_action.next_val"), segmentValue, //$NON-NLS-1$
+                        incrementSize);
+            }});
     }
 
     public long currValue(String segmentName) {
