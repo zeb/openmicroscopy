@@ -11,3 +11,5 @@ omero.db.jar=postgresql
 omero.db.jar_version=8.3-604.jdbc3
 omero.db.delimiter=;;
 omero.db.defer=
+
+omero.security.filter.bitand=(int8and(permissions,%s) = %s)

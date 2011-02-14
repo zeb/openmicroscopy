@@ -55,8 +55,6 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
 
     static public final String filterName = "securityFilter";
 
-    static private String defaultFilterCondition;
-
     static Map<String, String> parameterTypes() {
         Map<String, String> parameterTypes = new HashMap<String, String>();
         parameterTypes.put(is_share, "int");
@@ -67,9 +65,28 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
         return parameterTypes;
     }
 
-    static {
+    /**
+     * Query-fragment to be used to determine if all bits in a
+     * permissions column are set.
+     */
+    private final String bitand;
+
+    /**
+     * default constructor which calls all the necessary setters for this
+     * {@link FactoryBean}. Also constructs the {@link #defaultFilterCondition }
+     * This query clause must be kept in sync with
+     * {@link #passesFilter(Details, Long, Collection, Collection, boolean)}
+     *
+     * @see #passesFilter(Details, Long, Collection, Collection, boolean)
+     * @see FilterDefinitionFactoryBean#setFilterName(String)
+     * @see FilterDefinitionFactoryBean#setParameterTypes(Properties)
+     * @see FilterDefinitionFactoryBean#setDefaultFilterCondition(String)
+     */
+    public SecurityFilter(String bitand) {
+        this.bitand = bitand;
         // This can't be done statically because we need the securitySystem.
-        defaultFilterCondition = String.format("\n( "
+        // and bitand
+        String defaultFilterCondition = String.format("\n( "
                 + "\n 1 = :is_share OR \n 1 = :is_admin OR "
                 + "\n (group_id in (:leader_of_groups)) OR "
                 + "\n (owner_id = :current_user AND %s) OR " + // 1st arg U
@@ -77,20 +94,7 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
                 "\n (%s) " + // 3rd arg W
                 "\n)\n", isGranted(USER, READ), isGranted(GROUP, READ),
                 isGranted(WORLD, READ));
-    }
 
-    /**
-     * default constructor which calls all the necessary setters for this
-     * {@link FactoryBean}. Also constructs the {@link #defaultFilterCondition }
-     * This query clause must be kept in sync with
-     * {@link #passesFilter(Details, Long, Collection, Collection, boolean)}
-     * 
-     * @see #passesFilter(Details, Long, Collection, Collection, boolean)
-     * @see FilterDefinitionFactoryBean#setFilterName(String)
-     * @see FilterDefinitionFactoryBean#setParameterTypes(Properties)
-     * @see FilterDefinitionFactoryBean#setDefaultFilterCondition(String)
-     */
-    public SecurityFilter() {
         this.setFilterName(filterName);
         this.setParameterTypes(parameterTypes());
         this.setDefaultFilterCondition(defaultFilterCondition);
@@ -154,12 +158,10 @@ public class SecurityFilter extends FilterDefinitionFactoryBean {
     // ~ Helpers
     // =========================================================================
 
-    protected static String isGranted(Role role, Right right) {
+    protected String isGranted(Role role, Right right) {
         String bit = "" + Permissions.bit(role, right);
         String isGranted = String
-                .format(
-                        "(cast(permissions as bit(64)) & cast(%s as bit(64))) = cast(%s as bit(64))",
-                        bit, bit);
+                .format(bitand, bit, bit);
         return isGranted;
     }
 

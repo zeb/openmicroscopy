@@ -34,7 +34,9 @@
 
   <bean id="roles" class="ome.system.Roles"/>
 
-  <bean id="securityFilter" class="ome.tools.hibernate.SecurityFilter"/>
+  <bean id="securityFilter" class="ome.tools.hibernate.SecurityFilter">
+    <constructor-arg value="${omero.security.filter.bitand}"/>
+  </bean>
 
   <bean id="systemTypes" class="ome.security.SystemTypes"/>
 
