@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ome.api.IQuery;
-import ome.api.IUpdate;
+import ome.api.local.LocalQuery;
+import ome.api.local.LocalUpdate;
 import ome.model.IEnum;
 import ome.model.IObject;
 import ome.model.acquisition.Arc;
@@ -113,10 +113,10 @@ public class OMEROMetadataStore
     private ServiceFactory sf;
 
     /** OMERO query service */
-    private IQuery iQuery;
+    private LocalQuery iQuery;
 
     /** OMERO update service */
-    private IUpdate iUpdate;
+    private LocalUpdate iUpdate;
 
     /** A map of imageIndex vs. Image object ordered by first access. */
     private Map<Integer, Image> imageList = 
@@ -1406,8 +1406,8 @@ public class OMEROMetadataStore
     private void initializeServices(ServiceFactory sf)
     {
         // Now initialize all our services
-        iQuery = sf.getQueryService();
-        iUpdate = sf.getUpdateService();
+        iQuery = (LocalQuery) sf.getQueryService();
+        iUpdate = (LocalUpdate) sf.getUpdateService();
     }
 
     /*
@@ -1736,30 +1736,28 @@ public class OMEROMetadataStore
      */
     public void populateMinMax(double[][][] imageChannelGlobalMinMax)
     {
-    	List<Channel> channelList = new ArrayList<Channel>();
     	double[][] channelGlobalMinMax;
     	double[] globalMinMax;
-    	Channel channel;
     	StatsInfo statsInfo;
-    	Pixels pixels, unloadedPixels;
+    	Channel channel, attachedChannel;
+    	Pixels pixels, attachedPixels;
     	for (int i = 0; i < imageChannelGlobalMinMax.length; i++)
     	{
     		channelGlobalMinMax = imageChannelGlobalMinMax[i];
     		pixels = pixelsList.get(i);
-    		unloadedPixels = new Pixels(pixels.getId(), false);
+    		attachedPixels = iQuery.get(Pixels.class, pixels.getId());
     		for (int c = 0; c < channelGlobalMinMax.length; c++)
     		{
     			globalMinMax = channelGlobalMinMax[c];
     			channel = pixels.getChannel(c);
+    			attachedChannel = iQuery.get(Channel.class, channel.getId());
     			statsInfo = new StatsInfo();
     			statsInfo.setGlobalMin(globalMinMax[0]);
     			statsInfo.setGlobalMax(globalMinMax[1]);
-    			channel.setStatsInfo(statsInfo);
-    			channel.setPixels(unloadedPixels);
-    			channelList.add(channel);
+    			attachedChannel.setStatsInfo(statsInfo);
+    			attachedChannel.setPixels(attachedPixels);
     		}
     	}
-    	Channel[] toSave = channelList.toArray(new Channel[channelList.size()]);
-    	iUpdate.saveArray(toSave);
+    	iUpdate.flush();
     }
 }
