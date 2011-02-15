@@ -384,7 +384,7 @@ public class ImportDialog extends JDialog implements ActionListener
                             DatasetItem.createEmptyDataset();
                         dbox.addItem(datasetItems[0]);
                         dbox.setEnabled(false);
-                        addDatasetBtn.setEnabled(false);
+                        addDatasetBtn.setEnabled(pbox.getSelectedIndex() != 0);
                         importBtn.setEnabled(false);
                     } else {
                         for (int k = 0; k < datasetItems.length; k++ )
