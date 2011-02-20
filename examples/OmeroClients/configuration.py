@@ -22,7 +22,7 @@ client3.closeSession()
 # Advanced configuration can also be done
 # via an InitializationData instance.
 data = Ice.InitializationData()
-data.properties = Ice.Util.createProperties()
+data.properties = Ice.createProperties()
 data.properties.setProperty("omero.host", "localhost")
 client4 = omero.client(data)
 client4.createSession("root","ome")
