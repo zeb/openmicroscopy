@@ -42,11 +42,9 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -1473,8 +1471,11 @@ class MeasurementViewerUI
 			new FileChooser(this, FileChooser.SAVE, "Save Results to Excel", 
 					"Save the Results data to a file which can be loaded by " +
 					"a spreadsheet.", filterList);
-		File f = UIUtilities.getDefaultFolder();
-		if (f != null) chooser.setCurrentDirectory(f);
+		try {
+			File f = UIUtilities.getDefaultFolder();
+			if (f != null) chooser.setCurrentDirectory(f);
+		} catch (Exception e) {}
+	
 		return chooser;
 	}
 	

@@ -101,9 +101,11 @@ class ImgSaverFileChooser
         addChoosableFileFilter(filter); 
         addChoosableFileFilter(new TIFFFilter());
         setFileFilter(filter);
+        try {
+        	File f = UIUtilities.getDefaultFolder();
+            if (f != null) setCurrentDirectory(f);
+		} catch (Exception e) {}
         
-        File f = UIUtilities.getDefaultFolder();
-        if (f != null) setCurrentDirectory(f);
         if (nameArea != null) setControlButtonsAreShown(false);
         else {
         	setApproveButtonToolTipText(

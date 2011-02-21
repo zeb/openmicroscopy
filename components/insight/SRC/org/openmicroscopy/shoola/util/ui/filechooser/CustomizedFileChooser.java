@@ -114,8 +114,11 @@ class CustomizedFileChooser
 		}
 		if (isAcceptAllFileFilterUsed())
 			setFileFilter(getAcceptAllFileFilter());
-		File f = UIUtilities.getDefaultFolder();
-		if (f != null) setCurrentDirectory(f);
+		try {
+			File f = UIUtilities.getDefaultFolder();
+			if (f != null) setCurrentDirectory(f);
+		} catch (Exception e) {}
+		
 		switch (model.getChooserType()) {
 			case FileChooser.SAVE:
 				setDialogType(SAVE_DIALOG);

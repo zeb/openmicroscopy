@@ -807,8 +807,10 @@ public class ImportDialog extends JDialog
     {
     	option = IMPORT;
     	//Set the current directory as the defaults
-    	UIUtilities.setDefaultFolder(
-    			chooser.getCurrentDirectory().toString());
+    	try {
+    		File dir = chooser.getCurrentDirectory(); 
+    	 	if (dir != null) UIUtilities.setDefaultFolder(dir.toString()); 
+		} catch (Exception e) {}
 
     	Map<File, Boolean> files = null;//table.getFilesToImport();
     	ImportableObject object = new ImportableObject(files,
