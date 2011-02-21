@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -675,6 +677,26 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
                     + principal.getName());
         }
         return ctx;
+    }
+
+    public EventContext reload(String uuid) {
+        final SessionContext ctx = cache.getSessionContext(uuid);
+        if (ctx == null) {
+            throw new RemovedSessionException("No session with uuid:"
+                    + uuid);
+        }
+        Future<SessionContext> future = executor.submit(
+                new Callable<SessionContext>(){
+                    public SessionContext call() throws Exception {
+                        return reload(ctx);
+                    }});
+
+        // Storing the freshly loaded context back in the SessionCache
+        // so that the users of getEventContext() can benefit from the
+        // newer view.
+        final SessionContext fresh = executor.get(future);
+        cache.refresh(uuid, fresh);
+        return fresh;
     }
 
     // ~ Notifications

@@ -52,10 +52,12 @@ public interface SqlAction {
         final private static Log log = LogFactory.getLog(SqlAction.class);
 
         public Object invoke(MethodInvocation arg0) throws Throwable {
-            log.info(String.format("%s.%s(%s)",
-                    arg0.getThis(),
-                    arg0.getMethod().getName(),
-                    Arrays.deepToString(arg0.getArguments())));
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("%s.%s(%s)",
+                        arg0.getThis(),
+                        arg0.getMethod().getName(),
+                        Arrays.deepToString(arg0.getArguments())));
+            }
             return arg0.proceed();
         }
 
@@ -86,6 +88,12 @@ public interface SqlAction {
 
     Long findRepoFile(String uuid, String dirname, String basename,
             String string);
+
+    String findRepoFilePath(String uuid, long id);
+
+    List<Long> findRepoPixels(String uuid, String dirname, String basename);
+
+    Long findRepoImageFromPixels(long id);
 
     int repoScriptCount(String uuid);
 
@@ -131,6 +139,19 @@ public interface SqlAction {
 
     void delCurrentEventLog(String key);
 
+    /**
+     * The implementation of this method guarantees that even if the current
+     * transaction fails that the value found will not be used by another
+     * transaction. Database implementations can choose whether to do this
+     * at the procedure level or by using transaction PROPAGATION settings
+     * in Java.
+     *
+     * @param segmentName
+     * @param incrementSize
+     * @return
+     * @see ticket:3697
+     * @see ticket:3253
+     */
     long nextValue(String segmentName, int incrementSize);
 
     long currValue(String segmentName);

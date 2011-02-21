@@ -94,6 +94,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 import Ice.Current;
@@ -334,27 +335,17 @@ public class PublicRepositoryI extends _RepositoryDisp {
 
             	Map<Integer, ome.model.core.Image> iMap = new HashMap<Integer, ome.model.core.Image>();
                 
-                List<BigInteger> pixIds = session.createSQLQuery(
-                        "select id from Pixels " +
-                        "where path = ? and name = ? and repo = ?")
-                        .setParameter(0, path)
-                        .setParameter(1, name)
-                        .setParameter(2, repoId)
-                        .list();
+                List<Long> pixIds = sql.findRepoPixels(repoId, path, name);
                 if (pixIds == null || pixIds.size() == 0) {
                     return iMap;
                 }
                 
-                for (BigInteger pId : pixIds) {
+                for (Long pId : pixIds) {
                 	
                     Map<String, String> params = sql.getPixelsParams(pId.longValue());
                     
                     long pixelsId = pId.longValue();
-                    BigInteger imageId = (BigInteger) session.createSQLQuery(
-                            "select image from Pixels " +
-                            "where id = ?")
-                            .setParameter(0, pixelsId)
-                            .uniqueResult();
+                    Long imageId = sql.findRepoImageFromPixels(pixelsId);
                     
                     Parameters p = new Parameters();
                     p.addId(new Long(imageId.longValue()));
@@ -1101,17 +1092,12 @@ public class PublicRepositoryI extends _RepositoryDisp {
                 .execute(currentUser, new Executor.SimpleWork(this, "getOriginalFile", uuid, path, name) {
                     @Transactional(readOnly = true)
                     public Object doWork(Session session, ServiceFactory sf) {
-                        BigInteger id = (BigInteger) session.createSQLQuery(
-                                "select id from OriginalFile " +
-                                "where path = ? and name = ? and repo = ?")
-                                .setParameter(0, path)
-                                .setParameter(1, name)
-                                .setParameter(2, uuid)
-                                .uniqueResult();
-                        if (id == null) {
+                        try {
+                            Long id = sql.findRepoFile(uuid, path, name, null);
+                            return sf.getQueryService().find(ome.model.core.OriginalFile.class, id.longValue());
+                        } catch (EmptyResultDataAccessException e) {
                             return null;
-                        } 
-                        return sf.getQueryService().find(ome.model.core.OriginalFile.class, id.longValue());
+                        }
                     }
                 });
         
@@ -1138,12 +1124,7 @@ public class PublicRepositoryI extends _RepositoryDisp {
         return (File) executor.execute(currentUser, new Executor.SimpleWork(this, "getFile", id) {
                     @Transactional(readOnly = true)
                     public Object doWork(Session session, ServiceFactory sf) {
-                            String path = (String) session.createSQLQuery(
-                                    "select path || name from OriginalFile " +
-                                    "where id = ? and repo = ?")
-                                    .setParameter(0, id)
-                                    .setParameter(1, uuid)
-                                    .uniqueResult();
+                            String path = sql.findRepoFilePath(uuid, id);
 
                             if (path == null) {
                                 return null;
@@ -1175,19 +1156,13 @@ public class PublicRepositoryI extends _RepositoryDisp {
                     @SuppressWarnings("unchecked")
                     @Transactional(readOnly = true)
                     public Object doWork(Session session, ServiceFactory sf) {
-                        List<BigInteger> pixIds = session.createSQLQuery(
-                                "select id from Pixels " +
-                                "where path = ? and name = ? and repo = ?")
-                                .setParameter(0, path)
-                                .setParameter(1, name)
-                                .setParameter(2, uuid)
-                                .list();
+                        List<Long> pixIds = sql.findRepoPixels(uuid, path, name);
                         if (pixIds == null || pixIds.size() == 0) {
                             return null;
                         }
                         
                         long pixelsId = 0;
-                        for (BigInteger pId : pixIds) {
+                        for (Long pId : pixIds) {
                             Map<String, String> params = sql.getPixelsParams(pId.longValue());
                             if (Integer.parseInt(params.get(IMAGE_NO_KEY)) == count) {
                                 pixelsId = pId.longValue();
@@ -1197,11 +1172,7 @@ public class PublicRepositoryI extends _RepositoryDisp {
                         if (pixelsId == 0) {
                             return null;
                         }
-                        BigInteger imageId = (BigInteger) session.createSQLQuery(
-                                "select image from Pixels " +
-                                "where id = ?")
-                                .setParameter(0, pixelsId)
-                                .uniqueResult();
+                        Long imageId = sql.findRepoImageFromPixels(pixelsId);
 
                         return sf.getQueryService().find(ome.model.core.Image.class, imageId.longValue());
                     }
@@ -1238,25 +1209,15 @@ public class PublicRepositoryI extends _RepositoryDisp {
 
                     	Map<Integer, ome.model.core.Image> iMap = new HashMap<Integer, ome.model.core.Image>();
                         
-                        List<BigInteger> pixIds = session.createSQLQuery(
-                                "select id from Pixels " +
-                                "where path = ? and name = ? and repo = ?")
-                                .setParameter(0, path)
-                                .setParameter(1, name)
-                                .setParameter(2, uuid)
-                                .list();
+                        List<Long> pixIds = sql.findRepoPixels(uuid, path, name);
                         if (pixIds == null || pixIds.size() == 0) {
                             return iMap;
                         }
                         
-                        for (BigInteger pId : pixIds) {
+                        for (Long pId : pixIds) {
                             Map<String, String> params = sql.getPixelsParams(pId.longValue());
                             long pixelsId = pId.longValue();
-                            BigInteger imageId = (BigInteger) session.createSQLQuery(
-                                    "select image from Pixels " +
-                                    "where id = ?")
-                                    .setParameter(0, pixelsId)
-                                    .uniqueResult();
+                            Long imageId = sql.findRepoImageFromPixels(pixelsId);
                             ome.model.core.Image image = sf.getQueryService().find(ome.model.core.Image.class, imageId.longValue());
                             iMap.put(new Integer(params.get(IMAGE_NO_KEY)),image);
                         }

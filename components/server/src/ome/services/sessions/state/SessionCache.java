@@ -118,7 +118,19 @@ public class SessionCache implements ApplicationContextAware {
          * increments {@link #hitCount} by one. Used when reloading the session.
          */
         Data(Data old, boolean reset) {
-            this(old.sessionContext, reset ? System.currentTimeMillis() : old.lastAccessTime, old.hitCount+1);
+            this(old, old.sessionContext, reset);
+        }
+
+        /**
+         * Like {@link Data#Data(Data, boolean)} but allows setting the
+         * {@link SessionContext} which should be stored in the new instance.
+         * This is used on reload. See {@link SessionCache#doUpdate()}.
+         * @param old
+         * @param ctx
+         * @param reset
+         */
+        Data(Data old, SessionContext ctx, boolean reset) {
+            this(ctx, reset ? System.currentTimeMillis() : old.lastAccessTime, old.hitCount+1);
         }
 
         Data(SessionContext sc, long last, long count) {
@@ -301,6 +313,29 @@ public class SessionCache implements ApplicationContextAware {
             public void close() {
                 sw.stop();
             }});
+    }
+
+    /**
+     * Used externally to refresh the {@link SessionContext} instance
+     * associated with the session uuid
+     * @param id
+     * @param replacement
+     */
+    public void refresh(String uuid, SessionContext replacement) {
+        Data data = getDataNullOrThrowOnTimeout(uuid, true);
+        refresh(uuid, data, replacement);
+    }
+
+    /**
+     *
+     * @param uuid
+     * @param data
+     * @param replacement
+     */
+    private void refresh(String uuid, Data data, SessionContext replacement) {
+        // Adding and upping hit information.
+        Data fresh = new Data(data, replacement, false);
+        this.sessions.put(uuid, fresh);
     }
 
     /**
@@ -570,9 +605,7 @@ public class SessionCache implements ApplicationContextAware {
                     if (replacement == null) {
                         internalRemove(id, "Replacement null");
                     } else {
-                        // Adding and upping hit information.
-                        Data fresh = new Data(data, false);
-                        this.sessions.put(id, fresh);
+                        refresh(id, data, replacement);
                     }
                 } catch (Exception e) {
                     // If an exception occurs it MAY be transient, therefore
@@ -600,4 +633,5 @@ public class SessionCache implements ApplicationContextAware {
         }
 
     }
+
 }

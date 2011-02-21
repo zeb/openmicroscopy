@@ -309,6 +309,8 @@ class MonitorClientI(monitors.MonitorClient):
         self.host = ""
         self.port = 0
         self.dirImportWait = 0
+        self.timeToLive = 0
+        self.timeToIdle = 0
         self.readers = ""
         self.importArgs = ""
         #: Id
@@ -516,7 +518,7 @@ class MonitorClientI(monitors.MonitorClient):
 
         try:
             exp = sf.getAdminService().lookupExperimenter(exName)
-            sess = sf.getSessionService().createSessionWithTimeout(p, 60000L)
+            sess = sf.getSessionService().createSessionWithTimeouts(p, self.timeToLive, self.timeToIdle)
             return sess.uuid.val
         except omero.ApiUsageException:
             self.log.info("User unknown: %s", exName)
@@ -699,6 +701,21 @@ class MonitorClientI(monitors.MonitorClient):
 
         """
         self.dirImportWait = dirImportWait
+
+    def setTimeouts(self, timeToLive, timeToIdle):
+        """
+            Set timeToLive and timeToIdle
+
+            :Parameters:
+                timeToLive : long
+                timeToIdle : long
+
+
+            :return: No explicit return value.
+
+        """
+        self.timeToLive = timeToLive
+        self.timeToIdle = timeToIdle
 
     def setHostAndPort(self, host, port):
         """
