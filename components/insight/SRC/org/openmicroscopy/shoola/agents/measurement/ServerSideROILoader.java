@@ -31,6 +31,7 @@ import java.util.Collection;
 //Application-internal dependencies
 import org.openmicroscopy.shoola.agents.measurement.view.MeasurementViewer;
 import org.openmicroscopy.shoola.env.data.views.CallHandle;
+import org.openmicroscopy.shoola.env.log.LogMessage;
 
 /**
  * Loads the server side ROIs into the measurement tool. Also if there are no
@@ -95,6 +96,26 @@ public class ServerSideROILoader
      */
     public void cancel() { handle.cancel(); }
     
+    /** 
+ 	 * Notifies the user that an error has occurred and discards the  
+ 	 * {@link #viewer}. 
+ 	 * @see DSCallAdapter#handleException(Throwable)  
+ 	 */ 
+ 	public void handleException(Throwable exc)  
+ 	{ 
+ 		int state = viewer.getState(); 
+ 		String s = "Data Retrieval Failure: "; 
+ 		LogMessage msg = new LogMessage(); 
+ 		msg.print("State: "+state); 
+ 		msg.print(s); 
+ 		msg.print(exc); 
+ 		registry.getLogger().error(this, msg); 
+ 		if (state != MeasurementViewer.DISCARDED) 
+ 			registry.getUserNotifier().notifyError("Data Retrieval Failure",  
+ 		                                               s, exc); 
+         viewer.setLoadingFromServerClient(null); 
+ 	} 
+ 	
     /**
      * Feeds the result back to the viewer.
      * @see MeasurementViewerLoader#handleResult(Object)

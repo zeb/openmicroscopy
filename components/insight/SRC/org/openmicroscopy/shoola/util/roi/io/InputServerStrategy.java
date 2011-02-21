@@ -425,7 +425,6 @@ class InputServerStrategy
 	 */
 	private MeasureLineFigure createLineFigure(LineData data)
 	{
-		
 		double x1 = data.getX1();
 		double y1 = data.getY1();
 		double x2 = data.getX2();
@@ -460,7 +459,6 @@ class InputServerStrategy
 	 */
 	private MeasureBezierFigure createPolygonFigure(PolygonData data)
 	{
-		
 		MeasureBezierFigure fig = new MeasureBezierFigure(false, data.isReadOnly(),
 				data.isClientObject());
 		List<Point2D.Double> points = data.getPoints();

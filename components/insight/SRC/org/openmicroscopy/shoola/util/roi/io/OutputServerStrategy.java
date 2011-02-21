@@ -314,7 +314,10 @@ class OutputServerStrategy
 		double height = fig.getHeight();
 		
 		RectangleData rectangle = new RectangleData(x, y, width, height); 
-		rectangle.setText(fig.getText());
+		String text = fig.getText();
+		if (text != null && text.trim().length() > 0 && 
+				!text.equals(ROIFigure.DEFAULT_TEXT))
+			rectangle.setText(text);
 		
 		AffineTransform t = AttributeKeys.TRANSFORM.get(fig);
 		if (t != null)
@@ -353,7 +356,10 @@ class OutputServerStrategy
 		poly.setPoints(points, points1, points2, maskList);
 		if (t != null)
 			poly.setTransform(toTransform(t));
-		poly.setText(fig.getText());
+		String text = fig.getText();
+		if (text != null && text.trim().length() > 0 && 
+				!text.equals(ROIFigure.DEFAULT_TEXT))
+			poly.setText(text);
 		return poly;	
 	}
 	
@@ -387,7 +393,10 @@ class OutputServerStrategy
 		line.setPoints(points, points1, points2, maskList);
 		if (t != null)
 			line.setTransform(toTransform(t));
-		line.setText(fig.getText());
+		String text = fig.getText();
+		if (text != null && text.trim().length() > 0 && 
+				!text.equals(ROIFigure.DEFAULT_TEXT))
+			line.setText(text);
 		return line;
 	}
 	
@@ -421,7 +430,10 @@ class OutputServerStrategy
 		poly.setPoints(points, points1, points2, maskList);
 		if (t != null)
 			poly.setTransform(toTransform(t));
-		poly.setText(fig.getText());
+		String text = fig.getText();
+		if (text != null && text.trim().length() > 0 && 
+				!text.equals(ROIFigure.DEFAULT_TEXT))
+			poly.setText(text);
 		return poly;	
 	}
 	
