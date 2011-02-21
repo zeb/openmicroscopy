@@ -232,9 +232,9 @@ class DocComponent
 		if (openButton != null) {
 			//openButton.setEnabled(enabled);
 			//openButton.setVisible(enabled);
-			downloadButton.setEnabled(link);
-			downloadButton.setVisible(link);
-			if (enabled) count++;
+			openButton.setEnabled(link);
+			openButton.setVisible(link);
+			if (link) count++;
 		}
 		if (plotButton != null) {
 			plotButton.setEnabled(link);

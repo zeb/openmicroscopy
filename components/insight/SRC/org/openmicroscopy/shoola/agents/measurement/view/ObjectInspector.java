@@ -270,7 +270,6 @@ class ObjectInspector
 			return (Boolean) fieldTable.getModel().getValueAt(SHOW_TEXT_ROW, 1);
 		return false;
 	}
-	
 
 	/**
 	 * Returns <code>true</code> if the measurement has to be shown, 
