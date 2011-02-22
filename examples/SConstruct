@@ -84,7 +84,7 @@ map = { "options" : opts,
         "ENV" : {
             "ICE_CONFIG" : ice_config,
             "PATH": os.environ["PATH"],
-            "PYTHONPATH" : pypath + [os.path.join(builddir,"lib","python")] }}
+            "PYTHONPATH" : os.pathsep.join(pypath + [os.path.join(builddir,"lib","python")]) }}
 
 if platform.name == "darwin":
     map["CPPPATH"].append( '/opt/local/include/' )
