@@ -94,6 +94,13 @@ hibernate.dialect=${omero.db.dialect}
                         <!-- Extra space before ';' prevents multiple replacements -->
 			<fileset dir="${resrc.dest}" includes="ddl.sql"/>
 		</replaceregexp>
+                <!-- Deferring _index and similar constraints -->
+		<replaceregexp
+			match="unique\s(\(.*?\))"
+			replace="unique \1 ${omero.db.defer}"
+			flags="gs" byline="false">
+			<fileset dir="${resrc.dest}" includes="ddl.sql"/>
+		</replaceregexp>
 		<taskdef name="schemavalidator" classname="org.hibernate.tool.hbm2ddl.SchemaValidatorTask" classpathref="omero.classpath"/>
 		<!-- Disabled -->
 		<!--schemavalidator properties="${resrc.dest}/local.properties" config="${basedir}/test/test.cfg.xml"/-->
