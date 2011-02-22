@@ -935,5 +935,5 @@ class EditorComponent
 	 * @see Editor#isWritable()
 	 */
 	public boolean isWritable() { return model.isWritable(); }
-	
+
 }

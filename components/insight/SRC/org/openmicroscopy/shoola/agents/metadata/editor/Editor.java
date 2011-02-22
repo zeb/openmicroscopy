@@ -433,5 +433,5 @@ public interface Editor
 	 * @return See above.
 	 */
 	boolean isWritable();
-	
+
 }
