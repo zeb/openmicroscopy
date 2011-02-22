@@ -30,8 +30,11 @@ import ome.system.EventContext;
 import ome.system.Roles;
 import ome.testing.ObjectFactory;
 import ome.tools.hibernate.HibernateUtils;
+import ome.tools.hibernate.SessionFactory;
 import ome.util.CBlock;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.jmock.core.Constraint;
@@ -54,6 +57,10 @@ public class DeleteUnitTest extends MockObjectTestCase {
     LocalUpdate u;
     EventContext ec;
     SecuritySystem s;
+
+    Mock hm, xm;
+    Session hibernate;
+    Query query;
 
     @Override
     @BeforeClass

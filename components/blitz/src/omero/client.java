@@ -334,7 +334,7 @@ public class client {
      * 
      * Equivalent to OmeroPy's __del__ or OmeroCpp's omero::client::~client()
      */
-    protected void __del__() {
+    public void __del__() {
         try {
             closeSession();
         } catch (Exception e) {

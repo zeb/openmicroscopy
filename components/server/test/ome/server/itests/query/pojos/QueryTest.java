@@ -198,9 +198,9 @@ public class QueryTest extends AbstractManagedContextTest {
         Objective t1 = iUpdate.saveAndReturnObject(o);
 
         // Test value via jdbc
-        String jdbcQuery = "SELECT lensNa FROM Objective WHERE id = :id";
-        Float lensNA = (Float) iQuery.projection(jdbcQuery,
-            new Parameters().addId(t1.getId())).get(0)[0];
+        String jdbcQuery = "SELECT i FROM Objective o WHERE id = :id";
+        Float lensNA = ((Objective) iQuery.findByQuery(jdbcQuery,
+            new Parameters().addId(t1.getId()))).getLensNA().floatValue();
         assertEquals(dbl, lensNA.floatValue(), 0.01);
         try {
             assertEquals(dbl, lensNA.floatValue(), Float.MIN_VALUE);
@@ -209,8 +209,8 @@ public class QueryTest extends AbstractManagedContextTest {
         }
 
         // now test is with double which is our chosen solution
-        Double lensNADoubled = (Double) iQuery.projection(jdbcQuery,
-            new Parameters().addId(t1.getId())).get(0)[0];
+        Double lensNADoubled = ((Objective) iQuery.findByQuery(jdbcQuery,
+            new Parameters().addId(t1.getId()))).getLensNA();
         assertEquals(dbl, lensNADoubled.doubleValue(), 0.01);
         assertEquals(dbl, lensNADoubled.doubleValue(), Float.MIN_VALUE);
         assertEquals(dbl, lensNADoubled.doubleValue(), Double.MIN_VALUE);

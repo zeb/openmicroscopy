@@ -63,6 +63,10 @@ public class ServiceHandler implements MethodInterceptor, ApplicationListener {
         }
     }
 
+    public ServiceHandler(CurrentDetails cd) {
+        this(cd, 15000, 20000);
+    }
+
     public ServiceHandler(CurrentDetails cd, long methodTimeWarn, long methodTimeError) {
         this.cd = cd;
         this.methodTimeWarn = methodTimeWarn;
