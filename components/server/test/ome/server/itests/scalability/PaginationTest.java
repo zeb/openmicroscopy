@@ -19,13 +19,13 @@ import ome.testing.Report;
 
 import org.testng.annotations.Test;
 
-@Test(groups = { "integration" })
+@Test(enabled = false, groups = { "integration" })
 public class PaginationTest extends AbstractManagedContextTest {
 
     static int BIG_BATCH = 50;// 0;
     static int BIG_SIZE = 250;// 00;
 
-    @Test
+    @Test(enabled = false)
     public void testLotsOfSaves() {
         List<Long> ids = null;
         IObject[] objs = null;

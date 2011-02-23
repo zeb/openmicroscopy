@@ -132,6 +132,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
     Parameters noFilter;
 
     @Configuration(beforeTestClass = true)
+    @Test(groups = "ticket:73")
     public void test_createObjects() throws Exception {
         // Forcing setup once now.
         adaptSetUp();
@@ -380,7 +381,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
     public void testGetImagesReturnsNoNulls() throws Exception {
         Dataset d = new Dataset();
         d.setName("ticket:221");
-        Image i = new Image();
+        Image i = createImage();
         i.setName("ticket:221");
         Pixels p = ObjectFactory.createPixelGraph(null);
         i.addPixels(p);
@@ -392,13 +393,14 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 Collections.singleton(d.getId())));
         Image test = (Image) iQuery.execute(q);
         assertNotNull(test);
+        assertEquals(1, test.sizeOfPixels());
         assertNotNull(test.getPrimaryPixels());
         assertNotNull(test.getPrimaryPixels().getPixelsType());
     }
 
     @Test(groups = { "ticket:296" })
     public void testGetImagesTakesImageClass() throws Exception {
-        Image i = new Image();
+        Image i = createImage();
         i.setName("ticket:296");
         i = iUpdate.saveAndReturnObject(i);
 
@@ -412,7 +414,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
 
     @Test(groups = { "ticket:172" })
     public void testGetImagesReturnsEventTimes() throws Exception {
-        Image i = new Image();
+        Image i = createImage();
         i.setName("ticket:172");
         i = iUpdate.saveAndReturnObject(i);
 
@@ -430,7 +432,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
 
         Dataset d = new Dataset();
         d.setName("CollectionCounts");
-        Image i = new Image();
+        Image i = createImage();
         i.setName("CollectionCounts");
         TimestampAnnotation ta = new TimestampAnnotation();
         ta.setNs("CollectionCounts");

@@ -198,7 +198,7 @@ public class QueryTest extends AbstractManagedContextTest {
         Objective t1 = iUpdate.saveAndReturnObject(o);
 
         // Test value via jdbc
-        String jdbcQuery = "SELECT i FROM Objective o WHERE id = :id";
+        String jdbcQuery = "SELECT o FROM Objective o WHERE id = :id";
         Float lensNA = ((Objective) iQuery.findByQuery(jdbcQuery,
             new Parameters().addId(t1.getId()))).getLensNA().floatValue();
         assertEquals(dbl, lensNA.floatValue(), 0.01);

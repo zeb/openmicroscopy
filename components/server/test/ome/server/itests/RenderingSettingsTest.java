@@ -8,7 +8,7 @@ import ome.model.containers.ProjectDatasetLink;
 import ome.model.core.Image;
 import ome.model.core.Pixels;
 
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class RenderingSettingsTest extends AbstractManagedContextTest {
@@ -21,7 +21,7 @@ public class RenderingSettingsTest extends AbstractManagedContextTest {
 
     // =========================================================================
 
-    @BeforeClass
+    @BeforeMethod
     protected void init() throws Exception {
         rsx = factory.getRenderingSettingsService();
 

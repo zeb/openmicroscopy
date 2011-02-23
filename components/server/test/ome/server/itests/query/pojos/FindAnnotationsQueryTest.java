@@ -93,7 +93,7 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
         list = (List) iQuery.execute(q);
     }
 
-    @Test
+    @Test(enabled = false)
     public void test_images_exist() throws Exception {
         ids = new HashSet(data.getMax("Image.Annotated.ids", 2));
         q = new PojosFindAnnotationsQueryDefinition(new Parameters()
@@ -106,7 +106,7 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void test_dataset_exist() throws Exception {
         ids = new HashSet(data.getMax("Dataset.Annotated.ids", 2));
         q = new PojosFindAnnotationsQueryDefinition(new Parameters()

@@ -62,6 +62,7 @@ public class SequencesTest extends AbstractManagedContextTest {
      */
     @BeforeMethod
     public void reset() {
+        sql = (SqlAction) applicationContext.getBean("simplSqlAction");
         final long original = getCurrentNextValue(seq_name);
         long loop = -1L;
         do {

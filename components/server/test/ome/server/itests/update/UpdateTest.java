@@ -29,6 +29,7 @@ import ome.model.display.CodomainMapContext;
 import ome.model.display.RenderingDef;
 import ome.model.display.Thumbnail;
 import ome.model.enums.Correction;
+import ome.model.enums.Format;
 import ome.model.enums.Immersion;
 import ome.model.enums.Medium;
 import ome.model.jobs.ImportJob;
