@@ -539,6 +539,14 @@ class TreeViewerWin
     	}
     }
     
+    /** Adds the metadata editor. */
+    void initializeDisplay()
+    {
+    	rightComponent = model.getMetadataViewer().getEditorUI();
+    	if (metadataVisible && rightComponent != null)
+    		rightPane.setRightComponent(rightComponent);
+    }
+
     /**
      * Selects the pane corresponding to the passed index.
      * 
@@ -933,24 +941,27 @@ class TreeViewerWin
     /** Shows or hides the Tree Viewer. */
 	void setMetadataVisibility()
 	{
+		if (rightComponent == null)
+			rightComponent = model.getMetadataViewer().getEditorUI();
 		if (metadataVisible) {
-			if (rightComponent == null)
-				rightComponent = rightPane.getRightComponent();
-			dividerRightLocation = rightPane.getDividerLocation();
 			Component[] components = rightPane.getComponents();
-			if (components != null) {
+			if (components != null && components.length > 0) {
 				boolean b = false;
 				for (int i = 0; i < components.length; i++) {
 					if (components[i] == rightComponent)
 						b = true;
 				}
-				if (b && rightComponent != null)
+				if (b) {
 					rightPane.remove(rightComponent);
+					dividerRightLocation = rightPane.getDividerLocation();
+				}
 			}
 		} else {
 			if (rightComponent != null) {
 				rightPane.add(rightComponent);
-				rightPane.setDividerLocation(dividerRightLocation);
+				if (dividerRightLocation > 0) 
+					rightPane.setDividerLocation(dividerRightLocation);
+				else rightPane.setResizeWeight(WEIGHT);
 			}
 		}
 		metadataVisible = !metadataVisible;
