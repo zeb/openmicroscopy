@@ -154,7 +154,9 @@ public class Analyser
         Object o = fe.getPartialResult();
         if (o != null) {
         	if (o instanceof Boolean) {
-        		onException(MESSAGE_RUN, null); 
+        		Boolean b = (Boolean) o;
+        		if (!b.booleanValue())
+        			onException(MESSAGE_RUN, null); 
         	} else {
         		callBack = (ScriptCallback) o;
             	callBack.setAdapter(this);

@@ -393,8 +393,6 @@ public abstract class ActivityComponent
 		toolBar.add(Box.createHorizontalStrut(5));
 		toolBar.add(infoButton);
 		toolBar.add(Box.createHorizontalStrut(5));
-		//toolBar.add(infoButton);
-		//toolBar.add(Box.createHorizontalStrut(5));
 		buttonIndex = 12;
 		//}
 		toolBar.add(cancelButton);
@@ -879,7 +877,7 @@ public abstract class ActivityComponent
 					entry = (Entry) i.next();
 					this.result = entry.getValue();
 				}
-			} else this.result = m;
+			} else this.result = m; //can be an empty map
 		}
 		downloadButton.setVisible(isDownloadable(this.result));
 		if (isViewable(this.result)) {
