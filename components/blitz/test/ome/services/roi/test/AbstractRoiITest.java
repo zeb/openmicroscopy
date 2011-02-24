@@ -55,11 +55,11 @@ public class AbstractRoiITest extends AbstractServantTest {
 
         geomTool = (GeomTool) ctx.getBean("geomTool");
         sql = (SqlAction) ctx.getBean("simpleSqlAction");
-        user_roisvc = new RoiI(be, geomTool, sql);
+        user_roisvc = new RoiI(be, geomTool);
         user_roisvc.setServiceFactory(user_sf);
         user_roisvc.setServiceFactory(user_sf);
 
-        root_roisvc = new RoiI(be, geomTool, sql);
+        root_roisvc = new RoiI(be, geomTool);
         root_roisvc.setServiceFactory(root_sf);
         root_roisvc.setServiceFactory(root_sf);
     }

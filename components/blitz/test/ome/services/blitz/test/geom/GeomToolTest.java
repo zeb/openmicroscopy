@@ -12,17 +12,12 @@ import ome.api.IPixels;
 import ome.io.nio.PixelsService;
 import ome.services.roi.GeomTool;
 import ome.services.roi.PixelData;
+import ome.services.util.Executor;
 import ome.system.OmeroContext;
 import ome.tools.hibernate.SessionFactory;
 import ome.util.SqlAction;
-import omero.model.Ellipse;
-import omero.model.Line;
-import omero.model.Point;
-import omero.model.Rect;
 import omero.model.Shape;
 
-import org.hibernate.Session;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -47,8 +42,8 @@ public class GeomToolTest extends TestCase {
         data = new PixelData((PixelsService) ctx.getBean("/OMERO/Pixels"),
                 (IPixels) ctx.getBean("internal-ome.api.IPixels"));
 
-        ex = (Executor) ctx.getBean("executor");
-        uuid = (String) ctx.getBean("uuid");
+        Executor ex = (Executor) ctx.getBean("executor");
+        String uuid = (String) ctx.getBean("uuid");
         geomTool = new GeomTool(data, sql, factory, ex, uuid);
 
     }

@@ -44,24 +44,6 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
     }
 
     @Test
-    public void testNewRecursiveEntityFieldOnDetachedPixels() throws Exception {
-        // PREPARE ----------------------------------------------
-        p.setRelatedTo(ObjectFactory.createPixelGraph(null));
-        p = iUpdate.saveAndReturnObject(p.getImage()).getPixels(0);
-
-        // TEST -------------------------------------------------
-        assertTrue("Related-to is null", p.getRelatedTo() != null);
-        assertTrue("or it has no id", p.getRelatedTo().getId().longValue() > 0);
-
-        long id = (Long) iQuery.projection(
-                "select relatedto from Pixels where id = :id",
-                new Parameters().addId(p.getId())).get(0)[0];
-        assertTrue("Id *really* has to be there.", p.getRelatedTo().getId()
-                .longValue() == id);
-
-    }
-
-    @Test
     public void testDetachedRecursiveEntityFieldOnDetachedPixels()
             throws Exception {
         // PREPARE ----------------------------------------------

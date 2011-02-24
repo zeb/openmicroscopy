@@ -11,6 +11,8 @@
 
 import unittest
 import omero
+import omero.clients
+from omero_model_ChannelI import ChannelI
 from omero_model_PixelsI import PixelsI
 from omero_model_ImageI import ImageI
 from omero_model_DatasetI import DatasetI
@@ -243,6 +245,25 @@ class TestModel(unittest.TestCase):
         d.owner = None
         self.assert_( None == d.owner)
         d.ice_preMarshal()
+
+    def testProxy(self):
+        i = ImageI()
+        self.assertRaises(omero.ClientError, i.proxy)
+        i = ImageI(5, False)
+        i.proxy()
+
+    def testId(self):
+        i = ImageI(4)
+        self.assertEquals(4, i.id.val)
+
+    def testOrderedCollectionsTicket2547(self):
+        pixels = PixelsI()
+        channels = [ChannelI() for x in range(3)]
+        pixels.addChannel(channels[0])
+        self.assertEquals(1, pixels.sizeOfChannels())
+        old = pixels.setChannel(0, channels[1])
+        self.assertEquals(old, channels[0])
+        self.assertEquals(1, pixels.sizeOfChannels())
 
 if __name__ == '__main__':
     unittest.main()

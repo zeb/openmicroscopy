@@ -98,7 +98,7 @@ public class ReloadFilter extends UpdateFilter {
             if (o.getId() != null) {
                 throw new ApiUsageException(
                         "INSERTs only! Pass only new objects, enums, or "
-                                + "unloaded objects to this method.");
+                                + "unloaded objects to this method: " + o);
             }
 
         }

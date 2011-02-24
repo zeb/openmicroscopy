@@ -11,7 +11,7 @@ __name__ = 'omero'
 try:
     import exceptions, traceback, threading, logging
     import Ice, Glacier2, Glacier2_Router_ice
-    import uuid
+    import omero_ext.uuid as uuid # see ticket:3774
     sys = __import__("sys")
 
     api = __import__('omero.api')

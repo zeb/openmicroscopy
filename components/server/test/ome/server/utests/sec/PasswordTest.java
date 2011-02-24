@@ -148,7 +148,7 @@ public class PasswordTest extends MockObjectTestCase {
         initJdbc();
         userIdReturns1();
         mockSql.expects(once()).method("update").will(returnValue(1));
-        provider = new JdbcPasswordProvider(new PasswordUtil(sql));
+        provider = new JdbcPasswordProvider(sql);
         provider.changePassword("a", "b");
     }
 

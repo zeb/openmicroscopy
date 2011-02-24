@@ -25,6 +25,7 @@ import ome.security.basic.CurrentDetails;
 import ome.security.basic.OmeroInterceptor;
 import ome.security.basic.TokenHolder;
 import ome.services.sessions.SessionManager;
+import ome.services.sessions.state.SessionCache;
 import ome.services.sessions.stats.NullSessionStats;
 import ome.system.EventContext;
 import ome.system.Principal;
@@ -82,7 +83,7 @@ public abstract class AbstractBasicSecuritySystemTest extends
         mockMgr = mock(SessionManager.class);
         mgr = (SessionManager) mockMgr.proxy();
 
-        cd = new CurrentDetails();
+        cd = new CurrentDetails(new SessionCache());
         SystemTypes st = new SystemTypes();
         TokenHolder th = new TokenHolder();
         OmeroInterceptor oi = new OmeroInterceptor(st, new ExtendedMetadata(),

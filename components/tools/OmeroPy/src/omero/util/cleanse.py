@@ -69,7 +69,7 @@ Examples:
   %s --dry-run -k 629485-9392-582358-49402 /OMERO  # Uses a one-time session
 
 Report bugs to OME Users <ome-users@lists.openmicroscopy.org.uk>""" % \
-	(error, cmd, cmd)
+	(error, cmd, cmd, cmd, cmd)
 	sys.exit(2)
 
 class Cleanser(object):

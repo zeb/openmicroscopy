@@ -12,6 +12,7 @@ import ome.api.local.LocalLdap;
 import ome.logic.LdapImpl;
 import ome.model.meta.Experimenter;
 import ome.server.itests.AbstractManagedContextTest;
+import ome.util.SqlAction;
 
 import org.jmock.Mock;
 import org.springframework.ldap.core.LdapOperations;
@@ -27,15 +28,17 @@ public class MockedLdapTest extends AbstractManagedContextTest {
 
     // Using local versions since we need to mock them.
     LocalLdap ldap;
-    Mock mock;
+    Mock mockOps, mockSql;
     LdapOperations ops;
-
+    SqlAction sql;
+    
     @BeforeMethod
     public void setup() {
-        mock = new Mock(LdapOperations.class);
-        ops = (LdapOperations) mock.proxy();
+        mockOps = new Mock(LdapOperations.class);
+        mockSql = new Mock(SqlAction.class); 
+        ops = (LdapOperations) mockOps.proxy();
 
-        LdapImpl limpl = new LdapImpl(null, ops, jdbcTemplate, "default",
+        LdapImpl limpl = new LdapImpl(null, ops, sql, "default",
                 "groups", "attributes", "values", true);
         ldap = limpl;
 
