@@ -211,11 +211,6 @@ public class PostgresSqlAction extends SqlAction.Impl {
 
     }
 
-    public String configValue(String key) {
-        return jdbc.queryForObject(PsqlStrings.getString("sql_action.config_value"), //$NON-NLS-1$
-                String.class, key);
-    }
-
     public String dbUuid() {
         return jdbc.query(PsqlStrings.getString("sql_action.db_uuid"), //$NON-NLS-1$
                 new RowMapper<String>() {

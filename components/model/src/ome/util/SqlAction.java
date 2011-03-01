@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ome.conditions.InternalException;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
@@ -122,7 +120,11 @@ public interface SqlAction {
 
     String dbVersion();
 
-    String configValue(String key);
+    String configValue(String name);
+
+    int delConfigValue(String name);
+
+    int updateOrInsertConfigValue(String name, String value);
 
     String dbUuid();
 
@@ -266,6 +268,26 @@ public interface SqlAction {
         //
         // CONFIGURATION
         //
+
+        public String configValue(String key) {
+            return _jdbc().queryForObject(_lookup("config_value_select"), //$NON-NLS-1$
+                    String.class, key);
+        }
+
+        public int delConfigValue(String key) {
+            return _jdbc().update(_lookup("config_value_delete"), //$NON-NLS-1$
+                    key);
+        }
+
+        public int updateOrInsertConfigValue(String name, String value) {
+            int count = _jdbc().update(_lookup("config_value_update"), // $NON-NLS-1$
+                   value, name);
+            if (count == 0) {
+                count = _jdbc().update(_lookup("config_value_insert"), // $NON-NLS-1$
+                        name, value);
+            }
+            return count;
+        }
 
         public long selectCurrentEventLog(String key) {
             String value = _jdbc().queryForObject(

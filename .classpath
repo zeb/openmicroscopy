@@ -109,28 +109,28 @@
 	<classpathentry exported="true" kind="lib" path="lib/repository/mdbtools-java-9071a01.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/repository/ome-xml-9071a01.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/repository/poi-loci-9071a01.jar"/>
-	<classpathentry kind="lib" path="lib/repository/batik-1.7.jar"/>
-	<classpathentry kind="lib" path="lib/repository/batik-parser-1.7.jar"/>
-	<classpathentry kind="lib" path="lib/repository/batik-util-1.7.jar"/>
-	<classpathentry kind="lib" path="lib/repository/forms-1.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/repository/Image_5D-1.2.0.jar"/>
-	<classpathentry kind="lib" path="lib/repository/jarbundler-2.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/repository/jdepend-2.9.jar"/>
-	<classpathentry kind="lib" path="lib/repository/jts-1.10.jar"/>
-	<classpathentry kind="lib" path="lib/repository/omero-clients-util-r6779-b12.jar"/>
-	<classpathentry kind="lib" path="lib/repository/swingx-0.9.4.jar"/>
-	<classpathentry kind="lib" path="lib/repository/TableLayout-2006-11-27.jar"/>
-	<classpathentry kind="lib" path="lib/repository/jul-to-slf4j-1.5.8.jar"/>
-	<classpathentry kind="lib" path="lib/repository/cglib-2.2.jar"/>
-	<classpathentry kind="lib" path="lib/repository/hibernate-3.5.6-4510.jar" sourcepath="lib/repository/hibernate-sources-3.5.0-Final.jar"/>
-	<classpathentry kind="lib" path="lib/repository/hibernate-search-3.1.1.GA.jar"/>
-	<classpathentry kind="lib" path="lib/repository/hibernate-validator-3.1.0.GA.jar"/>
-	<classpathentry kind="lib" path="lib/repository/javassist-3.9.0.GA.jar"/>
-	<classpathentry kind="lib" path="lib/repository/lucene-analyzers-2.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/repository/lucene-core-2.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/repository/lucene-highlighter-2.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/repository/lucene-snowball-2.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/repository/lucene-spellchecker-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/batik-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/batik-parser-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/batik-util-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/forms-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/Image_5D-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/jarbundler-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/jdepend-2.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/jts-1.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/omero-clients-util-r6779-b12.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/swingx-0.9.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/TableLayout-2006-11-27.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/jul-to-slf4j-1.5.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/cglib-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/hibernate-3.5.6-4510.jar" sourcepath="lib/repository/hibernate-sources-3.5.0-Final.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/hibernate-search-3.1.1.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/hibernate-validator-3.1.0.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/javassist-3.9.0.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/lucene-analyzers-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/lucene-core-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/lucene-highlighter-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/lucene-snowball-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/repository/lucene-spellchecker-2.4.1.jar"/>
 	<classpathentry kind="output" path="target/eclipse-bin"/>
     <!-- spring -->
 	<classpathentry exported="true" kind="lib" path="lib/repository/com.springsource.org.aopalliance-1.0.0.jar"/>
