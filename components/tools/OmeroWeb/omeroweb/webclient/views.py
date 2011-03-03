@@ -641,7 +641,7 @@ def load_data(request, o1_type=None, o1_id=None, o2_type=None, o2_id=None, o3_ty
     else:
         template = "webclient/data/containers.html"
     
-    context = {'nav':request.session['nav'], 'url':url, 'eContext':manager.eContext, 'manager':manager, 'form_well_index':form_well_index}
+    context = {'nav':request.session['nav'], 'url':url, 'eContext':manager.eContext, 'manager':manager, 'form_well_index':form_well_index, 'index':index}
     
     t = template_loader.get_template(template)
     c = Context(request,context)
@@ -862,10 +862,10 @@ def load_metadata_details(request, c_type, c_id, share_id=None, **kwargs):
         else:
             if conn_share is not None:
                 template = "webclient/annotations/annotations_share.html"                
-                manager = BaseContainer(conn_share, c_type, c_id)
+                manager = BaseContainer(conn_share, c_type, c_id, index=index)
             else:
                 template = "webclient/annotations/annotations.html"                
-                manager = BaseContainer(conn, c_type, c_id)
+                manager = BaseContainer(conn, c_type, c_id, index=index)
                 manager.annotationList()
     except AttributeError, x:
         logger.error(traceback.format_exc())
