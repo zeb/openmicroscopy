@@ -70,7 +70,7 @@ public abstract class PasswordUtil {
 
     public static void changeUserPasswordById(SqlAction sql,
             Long id, String password) {
-        sql.setUserPassword(id, password);
+        sql.setUserPassword(id, preparePassword(password));
     }
 
     public static String getUserPasswordHash(SqlAction sql, Long id) {
