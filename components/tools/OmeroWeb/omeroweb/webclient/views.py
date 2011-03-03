@@ -84,7 +84,7 @@ from omeroweb.webgateway.views import getBlitzConnection
 from omeroweb.webgateway import views as webgateway_views
 #from extlib.gateway import _session_logout, timeit, getBlitzConnection
 
-#from extlib.gateway import BlitzGateway
+from extlib.gateway import OmeroWebGateway
 
 logger = logging.getLogger('views-web')
 

@@ -31,12 +31,27 @@ import datetime
 import logging
 import logging.handlers
 
+# CUSTOM CONFIG
+try:
+    import custom_settings
+except ImportError:
+    sys.stderr.write("Error: Can't find the file 'custom_settings.py' in the directory containing %r." \
+        "It appears you've customized things.\nYou'll have to run 'bin/omero web [settings|superuser|syncdb]', " \
+        "passing it your settings module.\n(If the file custom_settings.py does indeed exist, " \
+        "it's causing an ImportError somehow.)\n" % __file__)
+    sys.exit(1)
+
+
 # Debuging mode. 
 # A boolean that turns on/off debug mode.
 # For logging configuration please change 'LEVEL = logging.INFO' below
 # 
 # NEVER DEPLOY a site into production with DEBUG turned on.
-DEBUG = False # handler404 and handler500 works only when False
+try:
+    DEBUG = custom_settings.DEBUG
+except:
+    DEBUG = False # handler404 and handler500 works only when False
+
 TEMPLATE_DEBUG = DEBUG
 
 # Database settings
@@ -157,8 +172,10 @@ INTERNAL_IPS = ()
 LOGGING_LOG_SQL = False
 
 # LOGDIR path
-LOGDIR = os.path.join(os.path.join(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), '../'), '../'), '../'), 'var'), 'log').replace('\\','/')
-# LOGDIR = os.path.join(os.path.dirname(__file__), 'log').replace('\\','/')
+try:
+    LOGDIR = custom_settings.LOGDIR
+except:
+    LOGDIR = os.path.join(os.path.join(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), '../'), '../'), '../'), 'var'), 'log').replace('\\','/')
 
 if not os.path.isdir(LOGDIR):
     try:
@@ -178,16 +195,6 @@ logging.basicConfig(level=LEVEL,
                 filemode='a')
 
 logger = logging.getLogger()
-
-# CUSTOM CONFIG
-try:
-    import custom_settings
-except ImportError:
-    sys.stderr.write("Error: Can't find the file 'custom_settings.py' in the directory containing %r." \
-        "It appears you've customized things.\nYou'll have to run 'bin/omero web [settings|superuser|syncdb]', " \
-        "passing it your settings module.\n(If the file custom_settings.py does indeed exist, " \
-        "it's causing an ImportError somehow.)\n" % __file__)
-    sys.exit(1)
 
 try:
     ADMINS = custom_settings.ADMINS
