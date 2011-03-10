@@ -13,6 +13,7 @@ import Ice
 import Glacier2
 import omero
 import omero_Constants_ice
+import omero_ext.uuid as uuid # see ticket:3774
 
 from path import path
 from omero.cli import Context, BaseControl, CLI, NonZeroReturnCode
@@ -35,6 +36,9 @@ class MyStore(SessionsStore):
         self.exceptions = []
 
     def create(self, name, pasw, props, new=True):
+
+        if not isinstance(props, dict):
+            raise exceptions.Exception("Bad type")
 
         if self.exceptions:
             raise self.exceptions.pop(0)
@@ -341,6 +345,22 @@ class TestSessions(unittest.TestCase):
         cli._client = None # Forcing new instance
 
         del cli
+
+    def testCopiedSessionWorks(self):
+        """
+        Found by Colin while using a session key from
+        a non-CLI-source.
+        """
+        cli = MyCLI()
+
+        MOCKKEY = "MOCKKEY%s" % uuid.uuid4()
+
+        key_login = "-s testuser@testhost -k %s s login" % MOCKKEY
+
+        # Try with session when it's still available
+        cli.creates_client(sess=MOCKKEY, new=True)
+        cli.invoke(key_login)
+        cli._client = None # Forcing new instance
 
 if __name__ == '__main__':
     unittest.main()
