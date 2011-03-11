@@ -210,12 +210,12 @@ target_artifacts += artifacts
 target = '%s.linux' % TARGET_PREFIX
 # Since Insight relies on its MANIFEST to start via the JAR, we're leaving
 # libs/OmeroImporter-Beta-4.1.0-DEV.jar in the ZIP.
-ignore = ['omero_client.jar', 'omero-clients-util-r\d+-b\d+.jar'] + IGNORE
+ignore = ['omero-clients-util-r\d+-b\d+.jar'] + IGNORE
 
 for artifact in target_artifacts:
     extract(artifact, target, ignore)
 # Again, because Insight relies on its MANIFEST we're going to rename the
 # omero_client.jar to fit its requirements.
-client_jar = glob(os.path.join(target, 'libs', 'omero_client*.jar'))[0]
-os.rename(client_jar, os.path.join(target, 'libs', 'omero_client.jar'))
+#client_jar = glob(os.path.join(target, 'libs', 'omero_client*.jar'))[0]
+#os.rename(client_jar, os.path.join(target, 'libs', 'omero_client.jar'))
 compress('%s.zip' % target, target)
