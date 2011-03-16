@@ -4904,8 +4904,9 @@ class _ChannelWrapper (BlitzObjectWrapper):
         
         if self._obj.logicalChannel is not None:
             return LogicalChannelWrapper(self._conn, self._obj.logicalChannel)
-    
-    def getName (self):
+
+
+    def getLabel (self):
         """
         Returns the logical channel name, emission wave or index. The first that is not null
         in the described order.
@@ -4913,7 +4914,7 @@ class _ChannelWrapper (BlitzObjectWrapper):
         @return:    The logical channel string representation
         @rtype:     String
         """
-        
+
         lc = self.getLogicalChannel()
         rv = lc.name
         if rv is None:
@@ -4921,6 +4922,21 @@ class _ChannelWrapper (BlitzObjectWrapper):
         if rv is None:
             rv = self._idx
         return unicode(rv)
+
+
+    def getName (self):
+        """
+        Returns the logical channel name or None
+
+        @return:    The logical channel string representation
+        @rtype:     String
+        """
+        
+        lc = self.getLogicalChannel()
+        rv = lc.name
+        if rv is not None:
+            return unicode(rv)
+
 
     def getEmissionWave (self):
         """
@@ -6149,7 +6165,7 @@ class _ImageWrapper (BlitzObjectWrapper):
         return rv
 
     def _renderSplit_channelLabel (self, channel):
-        return str(channel.getEmissionWave())
+        return str(channel.getLabel())
 
     def renderSplitChannelImage (self, z, t, compression=0.9, border=2):
         """
