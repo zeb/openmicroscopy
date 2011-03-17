@@ -1308,7 +1308,7 @@ class TreeViewerComponent
 		}
 		switch (index) {
 			case CUT_AND_PASTE:
-			case COPY_AND_PASTE:    
+			case COPY_AND_PASTE:
 				break;
 			default:
 				throw new IllegalArgumentException("Index not supported.");

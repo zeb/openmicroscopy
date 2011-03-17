@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 //Third-party libraries
 
@@ -564,20 +565,23 @@ class OmeroDataServiceImpl
 		if (toCut == null) toCut = new HashMap();
 		Iterator i;
 		Object parent;
-		i = toCut.keySet().iterator();
+		Entry entry;
+		i = toCut.entrySet().iterator();
 		while (i.hasNext()) {
-			parent = i.next();
+			entry = (Entry) i.next();
+			parent = entry.getKey();
 			if (parent instanceof DataObject) //b/c of orphaned container
-				cut((DataObject) parent, (Set) toCut.get(parent));
+				cut((DataObject) parent, (Set) entry.getValue());
 		}
 
-		i = toPaste.keySet().iterator();
+		i = toPaste.entrySet().iterator();
 
 		while (i.hasNext()) {
-			parent = i.next();
+			entry = (Entry) i.next();
+			parent = entry.getKey();
 			if (parent instanceof DataObject)
-				addExistingObjects((DataObject) parent, 
-						(Set) toPaste.get(parent));
+				addExistingObjects((DataObject) parent,
+						(Set) entry.getValue());
 		}
 	}
 
