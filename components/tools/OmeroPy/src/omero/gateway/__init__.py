@@ -2533,10 +2533,12 @@ class _BlitzGateway (object):
         p.map["ids"] = rlist([rlong(a) for a in ids])
         if obj_type in ["Project", "Dataset", "Image", "Screen", "Plate"]:
             query = "select obj from %s obj join fetch obj.details.owner join fetch obj.details.group where obj.id in (:ids)" % obj_type
-            result = q.findAllByQuery(query, p)
+        elif obj_type == "ExperimenterGroup":
+            query = "select distinct g from ExperimenterGroup as g join fetch g.groupExperimenterMap as map join fetch map.child e where g.id in (:ids)"
         else:
             query = "select obj from %s obj where obj.id in (:ids)" % obj_type
-            result = q.findAllByQuery(query, p)
+
+        result = q.findAllByQuery(query, p)
         if obj_type == "Annotation":
             for r in result:
                 yield AnnotationWrapper._wrap(self, r)
