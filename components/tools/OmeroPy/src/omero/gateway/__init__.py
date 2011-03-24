@@ -2458,11 +2458,12 @@ class _BlitzGateway (object):
         else:
             return None
 
-    def getObject (self, obj_type, oid):
+    def getObject (self, obj_type, oid, params=None, attributes=None):
         """
         Convenience method for L{getObjects}. Returns a single wrapped object or None. 
         """
-        result = self.getObjects(obj_type, [oid])
+        oids = (oid!=None) and [oid] or None
+        result = self.getObjects(obj_type, oids, params=params, attributes=attributes)
         try:
             return result.next()
         except StopIteration:
@@ -2512,7 +2513,7 @@ class _BlitzGateway (object):
             yield wrapper(self, e)
     
 
-    def getObjects (self, obj_type, ids, params=None):
+    def getObjects (self, obj_type, ids, params=None, attributes=None):
         """
         Retrieve Objects by type E.g. "Image". Not Ordered. 
         Returns generator of appropriate L{BlitzObjectWrapper} type. E.g. L{ImageWrapper}.
@@ -2541,16 +2542,25 @@ class _BlitzGateway (object):
         # get the base query from the instantiated object itself. E.g "select obj Project as obj"
         query = wrapper().getQueryString()
 
+        clauses = []
+        # getting object by ids
         if ids != None:
-            query += " where obj.id in (:ids)"
+            clauses.append("obj.id in (:ids)")
             params.map["ids"] = rlist([rlong(a) for a in ids])
 
         # support filtering by owner for some object types
         if params.theFilter and params.theFilter.ownerId and obj_type in ["Project", "Dataset", "Image", "Screen", "Plate"]:
-            query += (ids != None) and " and" or " where"
-            query += " owner.id = (:eid)"
-            eid = params.theFilter.ownerId
-            params.map["eid"] = eid
+            clauses.append("owner.id = (:eid)")
+            params.map["eid"] = params.theFilter.ownerId
+
+        # finding by attributes
+        if attributes != None:
+            for k,v in attributes.items():
+                clauses.append('obj.%s=:%s' % (k, k) )
+                params.map[k] = omero_type(v)
+
+        if clauses:
+            query += " where " + (" and ".join(clauses))
 
         result = q.findAllByQuery(query, params)
         for r in result:
