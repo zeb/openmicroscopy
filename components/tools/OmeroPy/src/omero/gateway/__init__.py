@@ -2366,29 +2366,6 @@ class _BlitzGateway (object):
             return ProjectWrapper(self, pr[0])
         return None
 
-    def getPlate (self, oid):
-        """
-        Gets a Plate for given ID, with owner, group and screens loaded
-        
-        @param oid:     Plate ID.
-        @type oid:      Long
-        @return:        PlateWrapper or None
-        @rtype:         L{PlateWrapper}
-        """
-        
-        query_serv = self.getQueryService()
-        p = omero.sys.Parameters()
-        p.map = {}
-        p.map["oid"] = rlong(long(oid))
-        sql = "select pl from Plate pl join fetch pl.details.owner join fetch pl.details.group " \
-              "left outer join fetch pl.screenLinks spl " \
-              "left outer join fetch spl.parent sc where pl.id=:oid "
-        pl = query_serv.findByQuery(sql,p)
-        if pl is not None:
-            return PlateWrapper(self, pl)
-        else:
-            return None
-
     def getObject (self, obj_type, oid, params=None, attributes=None):
         """
         Convenience method for L{getObjects}. Returns a single wrapped object or None. 
@@ -4487,6 +4464,15 @@ _
         """
         return None
     
+    def getQueryString(self):
+        """
+        Returns a query string for constructing custom queries, loading the screen for each plate.
+        """
+        query = "select obj from Plate obj join fetch obj.details.owner join fetch obj.details.group " \
+              "left outer join fetch obj.screenLinks spl " \
+              "left outer join fetch spl.parent sc"
+        return query
+
 PlateWrapper = _PlateWrapper
 
 class _WellWrapper (BlitzObjectWrapper):
