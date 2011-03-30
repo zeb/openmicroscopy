@@ -4962,20 +4962,29 @@ class _ImageWrapper (BlitzObjectWrapper):
             meta_serv = self._conn.getMetadataService()
             instruments = meta_serv.loadInstrument(i.id.val)
 
-            if instruments._detectorLoaded:
-                i._detectorSeq.extend(instruments._detectorSeq)
-            if instruments._objectiveLoaded:
-                i._objectiveSeq.extend(instruments._objectiveSeq)
-            if instruments._lightSourceLoaded:
-                i._lightSourceSeq.extend(instruments._lightSourceSeq)
-            if instruments._filterLoaded:
-                i._filterSeq.extend(instruments._filterSeq)
-            if instruments._dichroicLoaded:
-                i._dichroicSeq.extend(instruments._dichroicSeq)
-            if instruments._filterSetLoaded:
-                i._filterSetSeq.extend(instruments._filterSetSeq)
-            if instruments._otfLoaded:
-                i._otfSeq.extend(instruments._otfSeq)
+            t = {}
+            for obj in instruments:
+                if t.has_key(obj.__class__.__name__):
+                    t[obj.__class__.__name__].append(obj)
+                else:
+                    t[obj.__class__.__name__] = [obj]
+            if t.has_key('DetectorI'):
+                i._detectorSeq.extend(t['DetectorI'])
+            if t.has_key('ObjectiveI'):
+                i._objectiveSeq.extend(t['ObjectiveI'])
+            for k in ('ArcI','FilamentI','LaserI','LightEmittingDiodeI'):
+                if t.has_key(k):
+                    i._lightSourceSeq.extend(t[k])
+            #if instruments._lightSourceLoaded:
+            #    i._lightSourceSeq.extend(instruments._lightSourceSeq)
+            if t.has_key('FilterI'):
+                i._filterSeq.extend(t['FilterI'])
+            if t.has_key('DichroicI'):
+                i._dichroicSeq.extend(t['DichroicI'])
+            if t.has_key('FilterSetI'):
+                i._filterSetSeq.extend(t['FilterSetI'])
+            if t.has_key('OTFI'):
+                i._otfSeq.extend(t['OTFI'])
                     
         return InstrumentWrapper(self._conn, i)
 
