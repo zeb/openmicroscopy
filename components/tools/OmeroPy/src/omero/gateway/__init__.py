@@ -2285,7 +2285,7 @@ class _BlitzGateway (object):
             return ProjectWrapper(self, pr[0])
         return None
 
-    def getObject (self, obj_type, oid, params=None, attributes=None):
+    def getObject (self, obj_type, oid=None, params=None, attributes=None):
         """
         Convenience method for L{getObjects}. Returns a single wrapped object or None. 
         """
