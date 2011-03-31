@@ -2455,32 +2455,6 @@ class _BlitzGateway (object):
             kwargs = {'link': BlitzObjectWrapper(self, e.copyAnnotationLinks()[0])}
             yield wrapper(self, e)
 
-    #################################
-    # Annotations                   #
-
-    def lookupTagAnnotation (self, name):
-        """
-        Gets tag by name, owned by the current user
-        
-        @param name:    Tag name (text value)
-        @type name:     String
-        @return:        Annotation
-        @rtype:         L{AnnotationWrapper}
-        """
-        
-        query_serv = self.getQueryService()
-        p = omero.sys.Parameters()
-        p.map = {} 
-        p.map["text"] = rstring(str(name))
-        p.map["eid"] = rlong(self.getEventContext().userId)
-        f = omero.sys.Filter()
-        f.limit = rint(1)
-        p.theFilter = f
-        sql = "select tg from TagAnnotation tg " \
-              "where tg.textValue=:text and tg.details.owner.id=:eid and tg.ns is null order by tg.textValue"
-        tg = query_serv.findByQuery(sql, p)
-        return AnnotationWrapper(self, tg)
-
     ################
     # Enumerations #
     
