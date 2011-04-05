@@ -2828,21 +2828,6 @@ class _BlitzGateway (object):
     ###################
     # Searching stuff #
 
-
-    def searchImages (self, text, created=None):
-        """
-        Fulltext search on Images.
-        
-        @param text:        The text to search for
-        @type text:         String
-        @param created:     List or tuple of creation times. (start, stop)
-        @type created:      L{omero.rtime} list or tuple
-        @return:            List of Images
-        @rtype:             List of L{ImageWrapper}
-        """
-        
-        return self.simpleSearch(text=text,created=created, types=(ImageWrapper,))
-
     def searchDatasets (self, text, created=None):
         """
         Fulltext search on Datasets.
@@ -2918,8 +2903,8 @@ class _BlitzGateway (object):
             types = (ProjectWrapper, DatasetWrapper, ImageWrapper)
         else:
             def getWrapper(obj_type):
-                if obj_type not in ["Project", "Dataset", "Image", "Screen", "Plate"]:
-                    raise AttributeError("Can only search for 'Project', 'Dataset', 'Image', 'Screen', 'Plate'")
+                if obj_type.lower() not in ["project", "dataset", "image", "screen", "plate"]:
+                    raise AttributeError("%s not recognised. Can only search for 'Project', 'Dataset', 'Image', 'Screen', 'Plate'" % obj_type)
                 return KNOWN_WRAPPERS.get(obj_type.lower(), None)
             types = [getWrapper(o) for o in obj_types]
         search = self.createSearchService()
