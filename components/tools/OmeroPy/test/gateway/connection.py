@@ -88,12 +88,12 @@ class ConnectionMethodsTest (lib.GTest):
         exps = map(lambda x: x.omeName, self.gateway.listExperimenters())
         for omeName in (self.USER.name, self.AUTHOR.name, self.ADMIN.name.decode('utf-8')):
             self.assert_(omeName in exps)
-            self.assert_(len(list(self.gateway.listExperimenters(omeName))) > 0)
-        self.assert_(len(list(self.gateway.listExperimenters(self.USER.name+self.AUTHOR.name+self.ADMIN.name))) ==  0)
+            self.assert_(len(list(self.gateway.findExperimenters(omeName))) > 0)
+        self.assert_(len(list(self.gateway.findExperimenters(self.USER.name+self.AUTHOR.name+self.ADMIN.name))) ==  0)
         ##
         # Test lookupExperimenter
-        self.assertEqual(self.gateway.lookupExperimenter(self.USER.name).omeName, self.USER.name)
-        self.assertEqual(self.gateway.lookupExperimenter(self.USER.name+self.AUTHOR.name+self.ADMIN.name), None)
+        self.assertEqual(self.gateway.findExperimenter(self.USER.name).omeName, self.USER.name)
+        self.assertEqual(self.gateway.findExperimenter(self.USER.name+self.AUTHOR.name+self.ADMIN.name), None)
         ##
         # still logged in as Author, test listImages(ns)
         ns = 'weblitz.test_annotation'

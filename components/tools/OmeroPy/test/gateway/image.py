@@ -14,10 +14,24 @@ import omero
 try:
     import Image
 except ImportError:
-    print "PIL not installed"
+    try:
+        from PIL import Image
+    except ImportError:
+        print "PIL not installed"
 
 import test.gateway.library as lib
 
+
+class MetadataImageTest (lib.GTest):
+    def setUp (self):
+        super(MetadataImageTest, self).setUp()
+        self.loginAsAuthor()
+        self.image = self.getMetadataTestImage()
+        
+    def testInstrument (self):
+        import pdb
+        pdb.set_trace()
+    
 
 class ImageTest (lib.GTest):
     def setUp (self):

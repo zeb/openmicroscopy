@@ -79,7 +79,7 @@ class WrapperTest (lib.GTest):
 
     def testExperimenterWrapper (self):
         self.loginAsAdmin()
-        e = self.gateway.lookupExperimenter(self.USER.name)
+        e = self.gateway.findExperimenter(self.USER.name)
         self.assertEqual(e.getDetails().getOwner().omeName, self.USER.name)
         self.assertRaises(NotImplementedError, list, e.listChildren())
 
