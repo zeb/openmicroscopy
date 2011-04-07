@@ -316,7 +316,7 @@ public interface SqlAction {
 
         public boolean getOriginalFileHasUrl(long id) { //$NON-NLS-1$
             return _jdbc().queryForInt(
-                _lookup("file_has_url")) > 0;
+                _lookup("file_has_url"), id) > 0;
         }
     }
 
