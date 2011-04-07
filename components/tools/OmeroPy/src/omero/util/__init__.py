@@ -356,6 +356,7 @@ class Server(Ice.Application):
             try:
                 self.adapter = self.communicator().createObjectAdapter(self.adapter_name)
                 prx = self.adapter.add(self.impl, self.identity)
+                prx = self.adapter.createDirectProxy(self.identity) # ticket:1978 for non-collocated registries
                 self.adapter.activate()
                 add_grid_object(self.communicator(), prx) # This must happen _after_ activation
             except:
