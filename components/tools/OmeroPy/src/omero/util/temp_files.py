@@ -129,35 +129,61 @@ class TempFileManager(object):
         locktest = None
 
         omerotemp = os.environ.get("OMERO_TEMPDIR", None)
+        homeprop = None
         try:
-            from win32com.shell import shellcon, shell
-            homeprop = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
-        except ImportError:
-            homeprop = os.path.expanduser("~")
+            homeprop = get_user_dir()
+        except:
+            pass # ticket:3194
         tempprop = tempfile.gettempdir()
         targets = [omerotemp, homeprop, tempprop]
+
+        name = None
+        choice = None
+        locktest = None
 
         for target in targets:
 
             if target is None:
                 continue
 
+            if choice is not None:
+                break
+
             try:
+
+                # 2805
+                omero_dir = path(target) / "omero"
+                if omero_dir.exists() and not omero_dir.isdir():
+                    self.logger.debug(""""omero" is not a directory: %s""" % omero_dir)
+                    continue
+                tmp_dir = omero_dir / "tmp"
+                if tmp_dir.exists() and not tmp_dir.isdir():
+                    self.logger.debug(""""tmp" is not a directory: %s""" % tmp_dir)
+                    continue
+
                 try:
-                    testdir = path(target)
-                    fd, name = tempfile.mkstemp(prefix=".lock_test", suffix=".tmp", dir=str(testdir))
+
+                    name = self.mkstemp(prefix=".lock_test", suffix=".tmp", dir=target)
+                    name = self.mkstemp(prefix=".lock_test", suffix=".tmp", dir=target)
                     locktest = open(name, "a+")
                     portalocker.lock(locktest, portalocker.LOCK_EX|portalocker.LOCK_NB)
                     locktest.close()
-                    self.logger.debug("Chose gloabl tmpdir: %s", testdir)
-                    break
+                    locktest = None
+                    choice = target
+                    self.logger.debug("Chose gloabl tmpdir: %s", choice)
                 finally:
                     if locktest is not None:
                         try:
                             locktest.close()
-                            os.close(fd)
                         except:
-                            self.logger.warn("Failed to remove lock test: %s", name, exc_info = True)
+                            self.logger.warn("Failed to close locktest: %s", name, exc_info = True)
+
+                    if name is not None:
+                        try:
+                            os.remove(name)
+                        except:
+                            self.logger.debug("Failed os.remove(%s)", name)
+
 
             except exceptions.Exception, e:
                 if "Operation not permitted" in str(e) or \
@@ -167,14 +193,13 @@ class TempFileManager(object):
                     # To prevent printing the warning, we just continue
                     # here.
                     self.logger.debug("%s does not support locking.", target)
-                    continue
                 else:
                     self.logger.warn("Invalid tmp dir: %s" % target, exc_info = True)
 
-        if locktest is None:
+        if choice is None:
             raise exceptions.Exception("Could not find lockable tmp dir")
 
-        return testdir / "omero" / "tmp"
+        return path(choice) / "omero" / "tmp"
 
     def username(self):
         """
@@ -217,6 +242,20 @@ class TempFileManager(object):
         """
         return self.dir
 
+    def mkstemp(self, prefix, suffix, dir, text = False):
+        """
+        Similar to tempfile.mkstemp name but immediately closes
+        the file descriptor returned and passes back just the name.
+        This prevents various Windows issues"
+        """
+        fd, name = tempfile.mkstemp(prefix = prefix, suffix = suffix, dir = dir, text = text)
+        self.logger.debug("Added file %s", name)
+        try:
+            os.close(fd)
+        except:
+            self.logger.warn("Failed to close fd %s" % fd)
+        return name
+
     def create_path(self, prefix, suffix, folder = False, text = False, mode = "r+"):
         """
         Uses tempfile.mkdtemp and tempfile.mkstemp to create temporary
@@ -227,12 +266,7 @@ class TempFileManager(object):
             name = tempfile.mkdtemp(prefix = prefix, suffix = suffix, dir = self.dir)
             self.logger.debug("Added folder %s", name)
         else:
-            fd, name = tempfile.mkstemp(prefix = prefix, suffix = suffix, dir = self.dir, text = text)
-            self.logger.debug("Added file %s", name)
-            try:
-                os.close(fd)
-            except:
-                self.logger.warn("Failed to close fd %s" % fd)
+            name = self.mkstemp(prefix, suffix, self.dir, text)
 
         return path(name)
 
