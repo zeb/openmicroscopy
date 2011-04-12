@@ -63,6 +63,91 @@ def rtype(val):
     else:
         raise omero.ClientError("Cannot handle conversion from: %s" % type(val))
 
+def wrap(val, cache=None):
+    """
+    """
+    if cache is None:
+        cache = {}
+    elif id(val) in cache:
+        return cache[id(val)]
+
+    if val is None:
+        return None
+    elif isinstance(val, (list, tuple)):
+        rv = rlist()
+        cache[id(val)] = rv
+        for x in val:
+            rv.val.append(wrap(x, cache))
+    elif isinstance(val, set):
+        rv = rset()
+        cache[id(val)] = rv
+        for x in val:
+            rv.val.add(wrap(x, cache))
+    elif isinstance(val, dict):
+        rv = rmap()
+        cache[id(val)] = rv
+        for k, v in val.items():
+            rv.val[k] = wrap(v, cache)
+        rv._validate()
+    elif isinstance(val, omero.RType):
+        rv = val
+    else:
+        rv = rtype(val)
+
+    return rv
+
+def unwrap(val, cache=None):
+    """
+    """
+    if cache is None:
+        cache = {}
+    elif id(val) in cache:
+        return cache[id(val)]
+
+    if val is None:
+        return None
+    elif isinstance(val, (list, tuple)):
+        rv = []
+        cache[id(val)] = rv
+        for x in val:
+            rv.append(unwrap(x, cache))
+    elif isinstance(val, set):
+        rv = set()
+        cache[id(val)] = rv
+        for x in val:
+            rv.add(unwrap(x, cache))
+    elif isinstance(val, dict):
+        rv = {}
+        cache[id(val)] = rv
+        for k, v in val.items():
+            rv[unwrap(k, cache)] = unwrap(v, cache)
+    elif isinstance(val, omero.RCollection):
+        if val.val is None:
+            rv = None
+            cache[id(val)] = None
+        else:
+            rv = []
+            cache[id(val)] = rv
+            for x in val.val:
+                rv.append(unwrap(x, cache))
+    elif isinstance(val, omero.RMap):
+        if val.val is None:
+            rv = None
+            cache[id(val)] = None
+        else:
+            rv = {}
+            cache[id(val)] = rv
+            for k, v in val.val.items():
+                rv[unwrap(k, cache)] = unwrap(v, cache)
+    elif isinstance(val, omero.RType): # Non-recursive
+        rv = val.val
+        cache[id(val)] = rv
+    else:
+        rv = val
+
+    return rv
+
+
 # Static factory methods (primitives)
 # =========================================================================
 
@@ -86,7 +171,7 @@ def rdouble(val):
     """
     if val == None or isinstance(val, omero.RDouble):
         return val
-    return RDoubleI(float(val))
+    return RDoubleI(val)
 
 def rfloat(val):
     """
@@ -95,7 +180,7 @@ def rfloat(val):
     """
     if val == None or isinstance(val, omero.RFloat):
         return val
-    return RFloatI(float(val))
+    return RFloatI(val)
 
 def rint(val):
     """
@@ -107,7 +192,7 @@ def rint(val):
         return val
     elif val == 0:
         return rint0
-    return RIntI(int(val))
+    return RIntI(val)
 
 def rlong(val):
     """
@@ -119,7 +204,7 @@ def rlong(val):
         return val
     elif val == 0:
         return rlong0
-    return RLongI(long(val))
+    return RLongI(val)
 
 def rtime(val):
     """
@@ -128,7 +213,7 @@ def rtime(val):
     """
     if val == None or isinstance(val, omero.RTime):
         return val
-    return RTimeI(long(val))
+    return RTimeI(val)
 
 # Static factory methods (objects)
 # =========================================================================
@@ -273,11 +358,11 @@ class RBoolI(omero.RBool):
         Required due to __getattr__ implementation.
         """
         pass # Currently unused
-      
+
 class RDoubleI(omero.RDouble):
 
     def __init__(self, value):
-        omero.RDouble.__init__(self, value)
+        omero.RDouble.__init__(self, float(value))
 
     def getValue(self, current = None):
         return self._val
@@ -332,7 +417,7 @@ class RDoubleI(omero.RDouble):
 class RFloatI(omero.RFloat):
 
     def __init__(self, value):
-        omero.RFloat.__init__(self, value)
+        omero.RFloat.__init__(self, float(value))
 
     def getValue(self, current = None):
         return self._val
@@ -387,7 +472,7 @@ class RFloatI(omero.RFloat):
 class RIntI(omero.RInt):
 
     def __init__(self, value):
-        omero.RInt.__init__(self, value)
+        omero.RInt.__init__(self, int(value))
 
     def getValue(self, current = None):
         return self._val
@@ -442,7 +527,7 @@ class RIntI(omero.RInt):
 class RLongI(omero.RLong):
 
     def __init__(self, value):
-        omero.RLong.__init__(self, value)
+        omero.RLong.__init__(self, long(value))
 
     def getValue(self, current = None):
         return self._val
@@ -497,7 +582,7 @@ class RLongI(omero.RLong):
 class RTimeI(omero.RTime):
 
     def __init__(self, value):
-        omero.RTime.__init__(self, value)
+        omero.RTime.__init__(self, long(value))
 
     def getValue(self, current = None):
         return self._val
@@ -1031,10 +1116,13 @@ class RMapI(omero.RMap):
         else:
             self._val = dict(arg) # May throw an exception
         self._val.update(kwargs)
+        self._validate()
+
+    def _validate(self):
         for k, v in self._val.items():
             if not isinstance(k, str):
                 raise ValueError("Key of wrong type: %s" % type(k))
-            if not isinstance(v, omero.RType):
+            if v is not None and not isinstance(v, omero.RType):
                 raise ValueError("Value of wrong type: %s" % type(v))
 
     def compare(self, rhs, current = None):
