@@ -1025,7 +1025,7 @@ def imageMarshal (image, key=None):
     ds = image.getDataset()
     
     #big images
-    tiles = (max(image.getWidth(), image.getHeight()) > 1024) and True or False
+    tiles = False #(max(image.getWidth(), image.getHeight()) > 1024) and True or False
     import math
     max_zoom = tiles and math.ceil(math.log(max(image.getWidth(), image.getHeight()),2))-1 or None
     width = tiles and math.ceil(image.getWidth()/max_zoom) or None
