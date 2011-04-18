@@ -94,15 +94,16 @@ class TimeIt (object):
     """
     logger = logging.getLogger('omero.timeit')
 
-    def __init__ (self, level=logging.DEBUG):
+    def __init__ (self, level=logging.DEBUG, func_name=None):
         self._level = level
+        self._func_name = func_name
  
     def __call__ (self, func):
         def wrapped (*args, **kwargs):
-            self.logger.log(self._level, "timing %s" % (func.func_name))
+            self.logger.log(self._level, "timing %s" % (self._func_name or func.func_name))
             now = time.time()
             rv = func(*args, **kwargs)
-            self.logger.log(self._level, "timed %s: %f" % (func.func_name, time.time()-now))
+            self.logger.log(self._level, "timed %s: %f" % (self._func_name or func.func_name, time.time()-now))
             return rv
         return wrapped
 
