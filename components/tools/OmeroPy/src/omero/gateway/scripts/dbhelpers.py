@@ -317,7 +317,7 @@ class ImageEntry (ObjectEntry):
         UserEntry.setGroupForSession(newconn, dataset.getDetails().getGroup().getName())
         session = newconn._sessionUuid
         #print session
-        exe += ' -s %s -k %s -p %s import -d %i -n' % (host, session, port, dataset.getId())
+        exe += ' import -s %s -k %s -p %s -d %i -n' % (host, session, port, dataset.getId())
         exe = exe.split() + [self.name, fpath]
         try:
             p = subprocess.Popen(exe,  shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
