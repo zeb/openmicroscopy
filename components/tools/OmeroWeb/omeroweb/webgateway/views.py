@@ -827,9 +827,9 @@ def render_movie (request, iid, axis, pos, server_id=None, _conn=None, **kwargs)
         else:
             fn = fpath #os.path.join(fpath, img.getName())
         if axis.lower() == 'z':
-            dext, mimetype = img.createMovie(fn, 0, img.z_count()-1, pos-1, pos-1, opts)
+            dext, mimetype = img.createMovie(fn, 0, img.getSizeZ()-1, pos-1, pos-1, opts)
         else:
-            dext, mimetype = img.createMovie(fn, pos-1, pos-1, 0, img.t_count()-1, opts)
+            dext, mimetype = img.createMovie(fn, pos-1, pos-1, 0, img.getSizeT()-1, opts)
         if fpath is None:
             movie = open(fn).read()
             os.close(fo)
@@ -1058,9 +1058,9 @@ def imageMarshal (image, key=None):
             'id': image.id,
             'size': {'width': image.getWidth(),
                      'height': image.getHeight(),
-                     'z': image.z_count(),
-                     't': image.t_count(),
-                     'c': image.c_count(),},
+                     'z': image.getSizeZ(),
+                     't': image.getSizeT(),
+                     'c': image.getSizeC(),},
             'pixel_size': {'x': image.getPixelSizeX(),
                            'y': image.getPixelSizeY(),
                            'z': image.getPixelSizeZ(),},
@@ -1426,7 +1426,7 @@ def list_compatible_imgs_json (request, server_id, iid, _conn=None, **kwargs):
             imgs.extend(ds.listChildren())
         # Filter the ones that would pass the applySettingsToImages call
         img_ptype = img.getPrimaryPixels().getPixelsType().getValue()
-        img_ccount = img.c_count()
+        img_ccount = img.getSizeC()
         img_ew = [x.getLabel() for x in img.getChannels()]
         img_ew.sort()
         def compat (i):
@@ -1435,7 +1435,7 @@ def list_compatible_imgs_json (request, server_id, iid, _conn=None, **kwargs):
             pp = i.getPrimaryPixels()
             if pp is None or \
                i.getPrimaryPixels().getPixelsType().getValue() != img_ptype or \
-               i.c_count() != img_ccount:
+               i.getSizeC() != img_ccount:
                 return False
             ew = [x.getLabel() for x in i.getChannels()]
             ew.sort()
