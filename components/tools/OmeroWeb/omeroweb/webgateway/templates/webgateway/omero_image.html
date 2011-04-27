@@ -897,12 +897,13 @@
                 Image Link
             </a><br />
           </div>
-          <div>
+{% block roi_buttons %}
+	  <div>
                 ROIs:
                 <a href="#" onclick="show_rois()">Show</a> |
                 <a href="#" onclick="hide_rois()">Hide</a>
           </div>
-          
+{% endblock roi_buttons %}
           {% block current_image_tools %}{% endblock %}
         </div>
             
@@ -1078,9 +1079,7 @@
     //if ($(document).width() < 1024 || $(document).height() < 768) 
     //  window.resizeTo(1024,768);
 {% endblock %}
-
     calcResize();
-
   });
 {% endblock content_script %}
 
