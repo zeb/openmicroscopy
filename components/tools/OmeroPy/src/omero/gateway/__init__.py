@@ -2294,35 +2294,35 @@ class _BlitzGateway (object):
         else:
             return None
         
-    def findObjects (self, obj_type, **kwargs):
-        """
-        find Objects by type, filtered by named arguments. Not Ordered. 
-        Supported types are "Project", "Dataset", "Image", "Screen", "Plate", "Well"
-        Filter arguments depend on class, and only direct object properties are supported,
-        like 'name' and 'description'.
-        Example:
-        >>> obj.findObjects('project', name='ProjName')
-        
-        @param obj_type:    Object type. E.g. "Project" see above,  case is not important
-        @type obj_type:     String
-        @return:            Generator yielding appropriate object wrappers
-        @rtype:             see above
-        """
-        wrapper = KNOWN_WRAPPERS.get(obj_type.lower(), None)
-        if not wrapper:
-            raise TypeError     # TODO - maybe a better Error?
-        q = self.getQueryService()
-        w = ''
-        p = omero.sys.Parameters()
-        p.map = {}
-        sql = "select obj from %s obj join fetch obj.details.owner join fetch obj.details.group" % wrapper().OMERO_CLASS
-        for k,v in kwargs.items():
-            w += ' obj.%s=:%s' % (k, k)
-            p.map[k] = omero_type(v)
-        if len(w):
-            sql += ' where' + w
-        for e in q.findAllByQuery(sql, p):
-            yield wrapper(self, e)
+#    def findObjects (self, obj_type, **kwargs):
+#        """
+#        find Objects by type, filtered by named arguments. Not Ordered. 
+#        Supported types are "Project", "Dataset", "Image", "Screen", "Plate", "Well"
+#        Filter arguments depend on class, and only direct object properties are supported,
+#        like 'name' and 'description'.
+#        Example:
+#        >>> obj.findObjects('project', name='ProjName')
+#        
+#        @param obj_type:    Object type. E.g. "Project" see above,  case is not important
+#        @type obj_type:     String
+#        @return:            Generator yielding appropriate object wrappers
+#        @rtype:             see above
+#        """
+#        wrapper = KNOWN_WRAPPERS.get(obj_type.lower(), None)
+#        if not wrapper:
+#            raise TypeError     # TODO - maybe a better Error?
+#        q = self.getQueryService()
+#        w = ''
+#        p = omero.sys.Parameters()
+#        p.map = {}
+#        sql = "select obj from %s obj join fetch obj.details.owner join fetch obj.details.group" % wrapper().OMERO_CLASS
+#        for k,v in kwargs.items():
+#            w += ' obj.%s=:%s' % (k, k)
+#            p.map[k] = omero_type(v)
+#        if len(w):
+#            sql += ' where' + w
+#        for e in q.findAllByQuery(sql, p):
+#            yield wrapper(self, e)
     
 
     def getObjects (self, obj_type, ids=None, params=None, attributes=None):
