@@ -1042,18 +1042,19 @@ def imageMarshal (image, key=None):
     
     image._prepareRenderingEngine()
     
-    #big images
-    tiles = image._re.hasPixelsPyramid()
-    width, height = image._re.getTileSize()
-    init_zoom = image._re.getResolutionLevel()
-    max_zoom = image._re.getResolutionLevels()-1
+    #big images - not yet backported to 4.1
+    
+    tiles = False #image._re.hasPixelsPyramid()
+    #width, height = image._re.getTileSize()
+    #init_zoom = image._re.getResolutionLevel()
+    #max_zoom = image._re.getResolutionLevels()-1
     try:
         rv = {
             'tiles': tiles,
-            'tile_size': {'width': width,
-                          'height': height},
-            'init_zoom': init_zoom,
-            'max_zoom': max_zoom,
+            #'tile_size': {'width': width,
+            #              'height': height},
+            #'init_zoom': init_zoom,
+            #'max_zoom': max_zoom,
             'id': image.id,
             'size': {'width': image.getWidth(),
                      'height': image.getHeight(),
