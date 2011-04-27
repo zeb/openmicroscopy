@@ -316,7 +316,7 @@ $.fn.viewportImage = function(options) {
         orig_height = height;
         cur_zoom = 100;
       }
-      var ztf = 100;
+      var ztf = Math.min(wrapwidth * 100.0 / orig_width, wrapheight * 100.0 / orig_height);
       if (only_shrink && ztf >= 100.0) {
         ztf = 100.0;
       }
