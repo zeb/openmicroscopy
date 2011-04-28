@@ -761,7 +761,7 @@ class OmeroImageServiceImpl
 				index++;
 			}
 		}
-		gateway.monitor(directory, supportedExtensions, container);
+		//gateway.monitor(directory, supportedExtensions, container);
 		return true;
 	}
 	

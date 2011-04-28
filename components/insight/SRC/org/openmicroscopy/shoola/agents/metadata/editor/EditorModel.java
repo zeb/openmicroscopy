@@ -25,6 +25,7 @@ package org.openmicroscopy.shoola.agents.metadata.editor;
 
 //Java imports
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -1276,8 +1277,6 @@ class EditorModel
 		boolean b = isSameObject(refObject);
 		this.refObject = refObject; 
 		parentRefObject = null;
-		if (thumbnails != null) thumbnails.clear();
-		thumbnails = null;
 		if (existingTags != null) existingTags.clear();
 		existingTags = null;
 		if (textualAnnotationsByUsers != null) 
