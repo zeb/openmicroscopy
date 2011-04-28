@@ -6282,7 +6282,6 @@ class OMEROGateway
 				FileAnnotationData fa;
 				ids = new ArrayList<Long>();
 				Object k;
-				/*
 				while (j.hasNext()) {
 					k = j.next();
 					if (k instanceof FileAnnotationData) {
@@ -6292,7 +6291,6 @@ class OMEROGateway
 							ids.add(fa.getFileID());
 					}
 				}
-				*/
 			} else ids = parameters.getOriginalFileIDs();
 			if (ids != null && ids.size() > 0) {
 				Iterator<Long> i = ids.iterator();
