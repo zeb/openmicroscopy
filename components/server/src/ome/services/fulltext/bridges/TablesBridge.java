@@ -143,7 +143,7 @@ public class TablesBridge extends BridgeHelper {
         annotation = getProxiedObject(annotation);
         if (annotation instanceof FileAnnotation) {
             final OriginalFile file = ((FileAnnotation) annotation).getFile();
-            final String mimetype = file.getMimetype();
+            final String mimetype = file.getFormat().getValue(); // 4.1 only
             final String path = ofs.getFilesPath(file.getId());
             // /////////////////////////////////////////////////
             if (OMERO_TABLE.equals(mimetype)) {

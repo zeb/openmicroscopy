@@ -49,5 +49,7 @@
     <dependency org="spring" name="spring-security-config" rev="${versions.spring-security}"/>
     <dependency org="spring" name="spring-security-ldap" rev="${versions.spring-security}"/>
     <dependency org="spring" name="spring-ldap" rev="${versions.spring-ldap}-all"/>
+    <!-- Loci -->
+    <dependency org="loci" name="netcdf" rev="4.0"/>
   </dependencies>
 </ivy-module>
