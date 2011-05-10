@@ -6454,7 +6454,7 @@ class _ObjectiveWrapper (BlitzObjectWrapper):
               '#immersion',
               '#correction',
               'workingDistance',
-              '#iris',
+              'iris',
               'version')
 
     def __bstrap__ (self):
