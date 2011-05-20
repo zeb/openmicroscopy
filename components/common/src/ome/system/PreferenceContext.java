@@ -101,10 +101,15 @@ public class PreferenceContext extends PreferencesPlaceholderConfigurer {
             }
             return parseStringValue("${" + key + "}", mergeProperties(),
                     new HashSet<String>());
+        } catch (IllegalArgumentException iae) {
+            return null; // Unknown property. Ok
         } catch (BeanDefinitionStoreException bdse) {
             return null; // Unknown property. Ok
         } catch (IOException e) {
             log.error("Error on mergeProperties()", e);
+            return null;
+        } catch (Exception exc) {
+            log.error("Other exception on getProperty", exc);
             return null;
         }
     }

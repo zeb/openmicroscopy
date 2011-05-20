@@ -19,6 +19,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -270,8 +271,12 @@ public interface SqlAction {
         //
 
         public String configValue(String key) {
-            return _jdbc().queryForObject(_lookup("config_value_select"), //$NON-NLS-1$
-                    String.class, key);
+            try {
+                return _jdbc().queryForObject(_lookup("config_value_select"), //$NON-NLS-1$
+                        String.class, key);
+            } catch (EmptyResultDataAccessException erdae) {
+                return null;
+            }
         }
 
         public int delConfigValue(String key) {
