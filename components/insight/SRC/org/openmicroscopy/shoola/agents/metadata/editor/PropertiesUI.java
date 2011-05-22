@@ -198,6 +198,9 @@ class PropertiesUI
 	/** Flag indicating to build the UI once. */
 	private boolean 			init;
 	
+	/** Description pane.*/
+	private JScrollPane			pane;
+	
 	/** Initializes the components composing this display. */
     private void initComponents()
     {
@@ -698,12 +701,12 @@ class PropertiesUI
         	 p.add(Box.createVerticalStrut(5));
         	 descriptionPanel = layoutEditablefield(editDescription, 
         			 descriptionPane, 5);
-        	 descriptionPanel.setBorder(AnnotationUI.EDIT_BORDER);
+        	 //descriptionPanel.setBorder(AnnotationUI.EDIT_BORDER);
 
-        	 JScrollPane pane = new JScrollPane(descriptionPanel);
+        	 pane = new JScrollPane(descriptionPanel);
+        	 pane.setBorder(AnnotationUI.EDIT_BORDER);
         	 Dimension d = pane.getPreferredSize();
         	 pane.getViewport().setPreferredSize(new Dimension(d.width, 60));
-        	 pane.setBorder(null);
         	 p.add(pane);
          } else if (refObject instanceof FileData) {
         	 /*
@@ -761,9 +764,12 @@ class PropertiesUI
         	add(Box.createVerticalStrut(5));
         	add(layoutScreenContent((ScreenData) refObject));
         }
+        pane.getVerticalScrollBar().setValue(
+    			pane.getVerticalScrollBar().getMinimum());
         if (data == null) return;
         add(Box.createVerticalStrut(5));
     	add(buildContentPanel(EditorUtil.transformPixelsData(data), img));
+    	
     }
 
 	/**
@@ -799,10 +805,10 @@ class PropertiesUI
 		} else if (field == descriptionPane) {
 			descriptionPane.setEnabled(editable); //was editable
 			if (editable) {
-				panel.setBorder(EDIT_BORDER_BLACK);
+				pane.setBorder(EDIT_BORDER_BLACK);
 				field.requestFocus();
 			} else {
-				panel.setBorder(EDIT_BORDER);
+				pane.setBorder(EDIT_BORDER);
 			}
 		}
 	}
@@ -957,6 +963,7 @@ class PropertiesUI
 		if (originalDescription == null || originalDescription.length() == 0)
 			originalDescription = DEFAULT_DESCRIPTION_TEXT;
 		descriptionPane.setText(originalDescription);
+		descriptionPane.setCaretPosition(0);
 		descriptionPane.setBackground(UIUtilities.BACKGROUND_COLOR);
     	descriptionPane.setForeground(UIUtilities.DEFAULT_FONT_COLOR);
     	
@@ -998,7 +1005,7 @@ class PropertiesUI
         }
         //buildGUI();
 	}
-	
+
 	/** Updates the data object. */
 	void updateDataObject() 
 	{
