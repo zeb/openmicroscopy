@@ -36,6 +36,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.openmicroscopy.shoola.agents.util.browser.TreeImageDisplay;
+import org.openmicroscopy.shoola.agents.util.browser.TreeImageTimeSet;
+
 //Third-party libraries
 
 //Application-internal dependencies
@@ -137,9 +140,11 @@ public class DataBrowserFactory
 	 */
 	public static final DataBrowser getDataBrowser(Object grandParent, 
 										Object parent, 
-										Collection<ImageData> images)
+										Collection<ImageData> images,
+										TreeImageDisplay node)
 	{
-		return singleton.createImagesDataBrowser(grandParent, parent, images);
+		return singleton.createImagesDataBrowser(grandParent, parent, images, 
+				node);
 	}
 	
 	/**
@@ -210,6 +215,8 @@ public class DataBrowserFactory
 		String key = parent.toString();
 		if (parent instanceof DataObject) 
 			key += ((DataObject) parent).getId();
+		else if (parent instanceof TreeImageTimeSet)
+			key = TreeImageTimeSet.createPath((TreeImageTimeSet) parent, key);
 		return singleton.browsers.get(key);
 	}
 
@@ -420,7 +427,8 @@ public class DataBrowserFactory
 	 * @return See above.
 	 */
 	private DataBrowser createImagesDataBrowser(Object grandParent, 
-									Object parent, Collection<ImageData> images)
+									Object parent, Collection<ImageData> images,
+									TreeImageDisplay node)
 	{
 		DataBrowserModel model = new ImagesModel(parent, images);
 		model.setGrandParent(grandParent);
@@ -430,6 +438,7 @@ public class DataBrowserFactory
 		String key = parent.toString();
 		if (parent instanceof DataObject) 
 			key += ((DataObject) parent).getId();
+		else key = TreeImageTimeSet.createPath(node, key);
 		browsers.put(key, comp);
 		return comp;
 	}
