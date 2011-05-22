@@ -1751,7 +1751,7 @@ class TreeViewerComponent
 			}
 		} else {
 			db = DataBrowserFactory.getDataBrowser(grandParentObject, 
-					parentObject, leaves);
+					parentObject, leaves, parent);
 			if (parent instanceof TreeImageTimeSet) {
 				ExperimenterData exp = getSelectedBrowser().getNodeOwner(parent);
 				db.setExperimenter(exp);
@@ -2196,7 +2196,7 @@ class TreeViewerComponent
 		Object grandParentObject = null;
 		if (display != null) grandParentObject =  display.getUserObject();
 		DataBrowser db = DataBrowserFactory.getDataBrowser(grandParentObject,
-				parentObject, leaves);
+				parentObject, leaves, parent);
 		//Set the userID of the owner of the time interval.
 		if (parent != null) {
 			ExperimenterData exp = getSelectedBrowser().getNodeOwner(parent);
