@@ -25,6 +25,7 @@ package org.openmicroscopy.shoola.agents.metadata.editor;
 
 //Java imports
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import javax.swing.JPanel;
@@ -32,8 +33,9 @@ import javax.swing.JPanel;
 //Third-party libraries
 
 //Application-internal dependencies
-import org.openmicroscopy.shoola.util.ui.MultilineLabel;
 import org.openmicroscopy.shoola.util.ui.border.TitledLineBorder;
+import org.openmicroscopy.shoola.util.ui.UIUtilities;
+import org.openmicroscopy.shoola.util.ui.omeeditpane.OMEWikiComponent;
 import pojos.TextualAnnotationData;
 
 /** 
@@ -54,7 +56,7 @@ class TextualAnnotationComponent
 {
 
 	/** Area displaying the textual annotation. */
-	private MultilineLabel 			area;
+	private OMEWikiComponent 		area;
 	
 	/** The annotation to handle. */
 	private TextualAnnotationData	data;
@@ -65,9 +67,10 @@ class TextualAnnotationComponent
 	/** Initializes the UI components. */
 	private void initialize()
 	{
-		area = new MultilineLabel();
-        area.setEditable(false);
+		area = new OMEWikiComponent(false);
+        area.setEnabled(false);
         area.setOpaque(true);
+		area.setForeground(UIUtilities.DEFAULT_FONT_COLOR);
         area.setText(data.getText());
     	String owner = model.formatOwner(data);
 		String date = model.formatDate(data);
@@ -108,9 +111,13 @@ class TextualAnnotationComponent
 	 */
 	void setAreaColor(Color color)
 	{
-		area.setOriginalBackground(color);
 		setBackground(color);
 		((TitledLineBorder) getBorder()).setLineColor(color);
+		Component[] components = getComponents();
+		for (int i = 0; i < components.length; i++) {
+			components[i].setBackground(color);
+		}
+		area.setBackground(color);
 	}
 	
 }
