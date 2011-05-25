@@ -9,7 +9,10 @@ package ome.logic;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import ome.annotations.RolesAllowed;
 import ome.api.IQuery;
@@ -23,6 +26,7 @@ import ome.parameters.Parameters;
 import ome.services.query.Query;
 import ome.services.search.FullText;
 import ome.services.search.SearchValues;
+import ome.tools.hibernate.QueryBuilder;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.Criteria;
@@ -35,6 +39,7 @@ import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.annotation.Propagation;
@@ -228,10 +233,18 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             public Object doInHibernate(Session session)
                     throws HibernateException {
 
-                Criteria c = session.createCriteria(example.getClass());
-                c.add(Example.create(example));
-                return c.uniqueResult();
-
+                try {
+                    Criteria c = session.createCriteria(example.getClass());
+                    c.add(Example.create(example));
+                    return c.uniqueResult();
+                } catch (IncorrectResultSizeDataAccessException irsdae) {
+                    throwNonUnique("findByExample");
+                } catch (NonUniqueResultException nure) {
+                    throwNonUnique("findByExample");
+                }
+                // Never reached!
+                return null;
+                
             }
         });
     }
@@ -271,9 +284,17 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             public Object doInHibernate(Session session)
                     throws HibernateException {
 
-                Criteria c = session.createCriteria(klass);
-                c.add(Restrictions.eq(fieldName, value));
-                return c.uniqueResult();
+                try {
+                    Criteria c = session.createCriteria(klass);
+                    c.add(Restrictions.eq(fieldName, value));
+                    return c.uniqueResult();
+                } catch (IncorrectResultSizeDataAccessException irsdae) {
+                    throwNonUnique("findByString");
+                } catch (NonUniqueResultException nure) {
+                    throwNonUnique("findByString");
+                }
+                // Never reached
+                return null;
 
             }
         });
@@ -340,20 +361,26 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                             + cce.getMessage()
                             + "\n"
                             + "Queries must return IObjects when using findByQuery. \n"
-                            + "Please try findAllByQuery for queries which return Lists.");
+                            + "Please try findAllByQuery for queries which return Lists. ");
+        } catch (IncorrectResultSizeDataAccessException irsdae) {
+            throwNonUnique(queryName);
         } catch (NonUniqueResultException nure) {
-            throw new ApiUsageException(
-                    "Query named:\n\t"
-                            + queryName
-                            + "\n"
-                            + "has returned more than one Object\n"
-                            + "findByQuery must return a single value.\n"
-                            + "Please try findAllByQuery for queries which return Lists.");
+            throwNonUnique(queryName);
         }
         return result;
-
     }
 
+    private void throwNonUnique(String queryName) {
+        throw new ApiUsageException(
+                "Query named:\n\n\t"
+                        + queryName
+                        + "\n\n"
+                        + "has returned more than one Object\n"
+                        + "findBy methods must return a single value.\n"
+                        + "Please try findAllBy methods for queries which return Lists.");
+
+    }
+    
     /**
      * @see ome.api.IQuery#findAllByQuery(java.lang.String,
      *      ome.parameters.Parameters)
@@ -392,6 +419,103 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                     }
                 });
     }
+
+    // ~ Aggregations
+    // =========================================================================
+
+    @SuppressWarnings("unchecked")
+    @RolesAllowed("user")
+    public List<Object[]> projection(final String query, Parameters p) {
+        final Parameters params = (p == null ? new Parameters() : p);
+        final Query<List<Object>> q = getQueryFactory().lookup(query, params);
+
+        @SuppressWarnings("rawtypes")
+        final List rv = (List) getHibernateTemplate().execute(q);
+        final int size = rv.size();
+        Object obj = null;
+        for (int i = 0; i < size; i++) {
+            obj = rv.get(i);
+            if (obj != null) {
+                if (!Object[].class.isAssignableFrom(obj.getClass())) {
+                    rv.set(i, new Object[]{obj});
+                }
+            }
+        }
+        return rv;
+    }
+
+    final static Pattern AGGS  = Pattern.compile("(count|sum|max|min)");
+    final static Pattern FIELD = Pattern.compile("\\w?[\\w.\\s\\+\\-\\*]*");
+
+    @RolesAllowed("user")
+    public Long aggByQuery(String agg, String field, String query,
+            Parameters params) {
+
+        if (!AGGS.matcher(agg).matches()) {
+            throw new ValidationException(agg + " does not match " + AGGS);
+        }
+
+        if (!FIELD.matcher(field).matches()) {
+            throw new ValidationException(field + " does not match " + FIELD);
+        }
+
+        final QueryBuilder qb = new QueryBuilder();
+        qb.select(agg + "("+field+")").append(query);
+        qb.params(params);
+        return (Long) getHibernateTemplate().execute(
+                new HibernateCallback() {
+                    public Object doInHibernate(Session session)
+                            throws HibernateException, SQLException {
+                        return qb.query(session).uniqueResult();
+                    }
+                });
+    }
+
+    @SuppressWarnings("unchecked")
+    @RolesAllowed("user")
+    public Map<String, Long> aggMapByQuery(String agg, String mapKey,
+            String field, String query, Parameters params) {
+        if (!AGGS.matcher(agg).matches()) {
+            throw new ValidationException(agg + " does not match " + AGGS);
+        }
+
+        if (!FIELD.matcher(field).matches()) {
+            throw new ValidationException(field + " does not match " + FIELD);
+        }
+
+        if (!FIELD.matcher(mapKey).matches()) {
+            throw new ValidationException(mapKey + " does not match " + FIELD);
+        }
+
+        final QueryBuilder qb = new QueryBuilder();
+        qb.select(mapKey, agg + "(" + field + ")").append(query);
+        qb.append(" group by " + mapKey);
+        qb.params(params);
+        List<Object[]> list = (List<Object[]>) getHibernateTemplate().execute(
+                new HibernateCallback() {
+                    public Object doInHibernate(Session session)
+                            throws HibernateException, SQLException {
+                        return qb.query(session).list();
+                    }
+                });
+
+        Map<String, Long> rv = new HashMap<String, Long>();
+        for (Object[] objs : list) {
+            Object key = objs[0];
+            Object value = objs[1];
+            Long l = null;
+            if (value instanceof Long) {
+                l = (Long) value;
+            } else if (value instanceof Integer) {
+                l = ((Integer) value).longValue();
+            } else {
+                throw new ValidationException("Value for key " + key + " is " + value);
+            }
+            rv.put(key.toString(), l);
+        }
+        return rv;
+    }
+
 
     // ~ Others
     // =========================================================================

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import ome.conditions.ApiUsageException;
 import ome.parameters.Filter;
+import ome.parameters.Parameters;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -333,6 +334,20 @@ public class QueryBuilder {
     // State methods
     // Used in case the standard workflow is not optimal
 
+    public void update(String table) {
+        sb.append("update ");
+        sb.append(table);
+        appendSpace();
+        skipFrom();
+    }
+
+    public void delete(String table) {
+        sb.append("delete ");
+        sb.append(table);
+        appendSpace();
+        skipFrom();
+    }
+
     public void skipFrom() {
         select = true;
         from = true;
@@ -347,4 +362,19 @@ public class QueryBuilder {
         filterTarget = string;
         this.filter = filter;
     }
+
+    public void params(Parameters params2) {
+        if (params2 != null) {
+            for (String key : params2.keySet()) {
+                Object o = params2.get(key).value;
+                if (o instanceof Collection) {
+                    paramList(key, (Collection) o);
+                } else {
+                    param(key, o);
+                }
+            }
+        }
+
+    }
+
 }
