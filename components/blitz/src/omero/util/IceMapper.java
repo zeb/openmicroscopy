@@ -49,7 +49,6 @@ import ome.util.ReverseModelMapper;
 import ome.util.Utils;
 import omeis.providers.re.RGBBuffer;
 import omeis.providers.re.data.PlaneDef;
-import omeis.providers.re.data.RegionDef;
 import omero.ApiUsageException;
 import omero.RTime;
 import omero.RType;
@@ -533,9 +532,7 @@ public class IceMapper extends ome.util.ModelMapper implements
         ec.leaderOfGroups = ctx.getLeaderOfGroupsList();
         ec.memberOfGroups = ctx.getMemberOfGroupsList();
         ec.isAdmin = ctx.isCurrentUserAdmin();
-        // ticket:2265 Removing from public interface
-        // ec.isReadOnly = ctx.isReadOnly();
-        ec.groupPermissions = convert(ctx.getCurrentGroupPermissions());
+        ec.isReadOnly = ctx.isReadOnly();
         return ec;
     }
 
@@ -560,11 +557,6 @@ public class IceMapper extends ome.util.ModelMapper implements
     public static PlaneDef convert(omero.romio.PlaneDef def)
             throws omero.ApiUsageException {
         PlaneDef pd = new PlaneDef(def.slice, def.t);
-        pd.setStride(def.stride);
-        omero.romio.RegionDef r = def.region;
-        if (r != null) {
-        	pd.setRegion(new RegionDef(r.x, r.y, r.width, r.height));
-        }
         switch (def.slice) {
         case XY.value:
             pd.setZ(def.z);
@@ -1191,29 +1183,6 @@ public class IceMapper extends ome.util.ModelMapper implements
 
         // CONCURRENCY
 
-        else if (ome.conditions.MissingPyramidException.class
-                .isAssignableFrom(c)) {
-            omero.MissingPyramidException mpe = new omero.MissingPyramidException();
-            mpe.backOff = ((ome.conditions.MissingPyramidException) t).backOff;
-            mpe.pixelsID = ((ome.conditions.MissingPyramidException) t).getPixelsId();
-            return IceMapper.fillServerError(mpe, t);
-        }
-
-        else if (ome.conditions.TryAgain.class
-                .isAssignableFrom(c)) {
-            omero.TryAgain ta = new omero.TryAgain();
-            ta.backOff = ((ome.conditions.TryAgain) t).backOff;
-            return IceMapper.fillServerError(ta, t);
-        }
-
-        else if (ome.conditions.LockTimeout.class
-                .isAssignableFrom(c)) {
-            omero.LockTimeout lt = new omero.LockTimeout();
-            lt.backOff = ((ome.conditions.LockTimeout) t).backOff;
-            lt.seconds = ((ome.conditions.LockTimeout) t).seconds;
-            return IceMapper.fillServerError(lt, t);
-        }
-
         else if (ome.conditions.DatabaseBusyException.class.isAssignableFrom(c)) {
             omero.DatabaseBusyException dbe = new omero.DatabaseBusyException();
             return IceMapper.fillServerError(dbe, t);
@@ -1232,16 +1201,6 @@ public class IceMapper extends ome.util.ModelMapper implements
         }
 
         // SECURITY
-
-        else if (ome.conditions.ReadOnlyGroupSecurityViolation.class.isAssignableFrom(c)) {
-            omero.ReadOnlyGroupSecurityViolation sv = new omero.ReadOnlyGroupSecurityViolation();
-            return IceMapper.fillServerError(sv, t);
-        }
-
-        else if (ome.conditions.GroupSecurityViolation.class.isAssignableFrom(c)) {
-            omero.GroupSecurityViolation sv = new omero.GroupSecurityViolation();
-            return IceMapper.fillServerError(sv, t);
-        }
 
         else if (ome.conditions.SecurityViolation.class.isAssignableFrom(c)) {
             omero.SecurityViolation sv = new omero.SecurityViolation();
