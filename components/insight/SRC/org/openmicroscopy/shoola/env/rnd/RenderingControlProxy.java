@@ -1275,8 +1275,6 @@ class RenderingControlProxy
     	//DataServicesFactory.isSessionAlive(context);
     	try {
     		 servant.resetDefaultsNoSave();
-    		 //servant.resetDefaults();
-    		 setModel(RGB);
     		 invalidateCache();
     		 initialize();
 		} catch (Throwable e) {
