@@ -3901,7 +3901,7 @@ class OMEROGateway
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Adds or removes the passed experimenters from the specified system group.
 	 * 
