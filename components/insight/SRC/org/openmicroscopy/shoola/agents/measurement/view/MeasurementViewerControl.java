@@ -42,6 +42,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
+
 import javax.swing.JMenu;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -477,24 +479,26 @@ class MeasurementViewerControl
 	void analyseSelectedFigures()
 	{
 		Collection<Figure> figures = model.getSelectedFigures();
-		if (figures.size() == 1) 
+		if (figures.size() != 1 && !view.inDataView()) return;
+		Iterator<Figure> j = figures.iterator();
+		ROIFigure figure = null;
+		if (j.hasNext()) figure = (ROIFigure) j.next();
+		if (figure == null) return;
+		ROIShape shape = figure.getROIShape();
+		List<ROIShape> shapeList = new ArrayList<ROIShape>();
+		ROI roi = shape.getROI();
+		TreeMap<Coord3D, ROIShape> shapeMap = roi.getShapes();
+		Entry entry;
+		Iterator i = shapeMap.entrySet().iterator();
+		ROIShape currentShape;
+		Coord3D c;
+		while (i.hasNext())
 		{
-			ROIFigure figure = (ROIFigure) figures.iterator().next();
-			ROIShape shape = figure.getROIShape();
-			if (view.inDataView()) 
-			{
-				List<ROIShape> shapeList = new ArrayList<ROIShape>();
-				ROI roi = shape.getROI();
-				TreeMap<Coord3D, ROIShape> shapeMap = roi.getShapes();
-				Iterator<Coord3D> shapeIterator = shapeMap.keySet().iterator();
-				while (shapeIterator.hasNext())
-				{
-					ROIShape currentShape = shapeMap.get(shapeIterator.next());
-					if(!(currentShape.getFigure() instanceof MeasureTextFigure))
-						shapeList.add(currentShape);
-				}
-				if (shapeList.size() != 0) model.analyseShapeList(shapeList);
-			}
+			entry = (Entry) i.next();
+			c = (Coord3D) entry.getKey();
+			currentShape = (ROIShape) entry.getValue();
+			if (!(currentShape.getFigure() instanceof MeasureTextFigure))
+				shapeList.add(currentShape);
 		}
 	}
 	
