@@ -435,9 +435,9 @@ class BlitzObjectWrapper (object):
         -->            return True
         -->          return False
         """
-        if self.isOwned() and (omero_version >= ['4','2','0'] or not self.isReadOnly()):
+        if self.isOwned() and not self.isReadOnly():
             return True
-        elif omero_version >= ['4','2','0'] and not self.isPrivate() and not self.isReadOnly():
+        elif not self.isPrivate() and not self.isReadOnly():
             return True
         return False
     
