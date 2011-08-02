@@ -2763,7 +2763,7 @@ def safeCallWrap (self, attr, f): #pragma: no cover
                 try:
 #                    if self._conn.c.sf.getSessionService().getReferenceCount(self._conn._sessionUuid) > 0:
                     # Recreate connection
-                    self._connect(forcejoin=True)
+                    self._connect(forcejoin=(not self._conn.isAnonymous()))
                     logger.debug('last try for %s' % attr)
                     # Last try, don't catch exception
                     func = getattr(self._obj, attr)
