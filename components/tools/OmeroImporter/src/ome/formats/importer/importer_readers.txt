@@ -67,6 +67,7 @@ loci.formats.in.TillVisionReader      # vws
 loci.formats.in.ARFReader             # arf
 loci.formats.in.CellomicsReader       # c01
 loci.formats.in.LiFlimReader          # fli
+loci.formats.in.CellWorxReader        # pnl, htd
 loci.formats.in.FakeReader            # fake
 
 # multi-extension messes
@@ -113,6 +114,7 @@ loci.formats.in.ImprovisionTiffReader # tif
 loci.formats.in.MetamorphTiffReader   # tif
 loci.formats.in.NikonTiffReader       # tif
 loci.formats.in.OMETiffReader         # tif
+loci.formats.in.SISReader             # tif
 
 # standard TIFF reader must go last (it accepts any TIFF)
 loci.formats.in.TiffReader            # tif, tiff
