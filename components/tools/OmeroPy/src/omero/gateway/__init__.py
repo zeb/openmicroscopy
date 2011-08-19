@@ -4096,7 +4096,7 @@ _
         """
         Returns a list of labels for the columns on this plate
         """
-        if self.columnNamingConvention.lower()=='number':
+        if self.columnNamingConvention and self.columnNamingConvention.lower()=='number':
             return range(1, self.getGridSize()['columns']+1)
         else:
             # this should simply be precalculated!
@@ -4106,11 +4106,11 @@ _
         """
         Returns a list of labels for the rows on this plate
         """
-        if self.rowNamingConvention.lower()=='number':
-            return range(1, self.getGridSize()['rows']+1)
-        else:
+        if self.rowNamingConvention and self.rowNamingConvention.lower()=='letter':
             # this should simply be precalculated!
             return [_letterGridLabel(x) for x in range(self.getGridSize()['rows'])]
+        else:
+            return range(1, self.getGridSize()['rows']+1)
 
     @timeit
     def getNumberOfFields (self):
