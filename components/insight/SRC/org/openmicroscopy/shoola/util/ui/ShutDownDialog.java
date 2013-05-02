@@ -89,7 +89,7 @@ public class ShutDownDialog
 	 */
 	private void initialize(int time)
 	{
-		checker = new NetworkChecker();
+		checker = NetworkChecker.fromDefaults();
 		removeWindowListener(windowAdapter);
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		remainingTime = time;

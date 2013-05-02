@@ -88,7 +88,7 @@ public class NetworkChecker {
 	
 	/** Creates a new instance.
 	 */
-	public NetworkChecker()
+	private NetworkChecker()
 	{
 		this(null);
 	}
@@ -99,11 +99,35 @@ public class NetworkChecker {
 	 * @param ipAddress The IP address of the server the client is connected to
 	 * or <code>null</code>.
 	 */
-	public NetworkChecker(String ipAddress)
+	private NetworkChecker(String ipAddress)
 	{
 		this.ipAddress = ipAddress;
 	}
 	
+	/**
+	 * Creates a vanilla NetworkChecker instance.
+	 *
+	 * @return a new, default <code>NetworkChecker<code> instance
+	 */
+	public static NetworkChecker fromDefaults() {
+	    return new NetworkChecker();
+	}
+
+	/**
+         * Creates a new NetworkChecker instance from a remote IP address.
+         *
+         * @param ipAddress the remote address to probe for network availability checks.
+         * @return a new <code>NetworkChecker<code> instance
+         * @throws IllegalArgumentException if the required ipAdress parameter is null or blank
+         */
+        public static NetworkChecker fromIpAddress(String ipAddress) {
+            if (null == ipAddress || ipAddress.trim().length() == 0) {
+                throw new IllegalArgumentException("Invalid IP adress: " + ipAddress);
+            }
+
+            return new NetworkChecker(ipAddress);
+        }
+
 	/**
 	 * Run the standard Java 1.6 check using reflection. If this is not 1.6 or later, then
 	 * exit successfully, printing this assumption to System.err. If any odd reflection error

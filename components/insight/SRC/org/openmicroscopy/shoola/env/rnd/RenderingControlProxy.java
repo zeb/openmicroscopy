@@ -861,7 +861,7 @@ class RenderingControlProxy
             throw new NullPointerException("No security context.");
         this.ctx = ctx;
         slaves = new ArrayList<RenderingControl>();
-        checker = new NetworkChecker();
+        checker = NetworkChecker.fromDefaults();
         UserCredentials uc = (UserCredentials)
         		context.lookup(LookupNames.USER_CREDENTIALS);
         String ip = null;
@@ -870,7 +870,7 @@ class RenderingControlProxy
 		} catch (Exception e) {
 			//ignore
 		}
-        checker = new NetworkChecker(ip);
+        checker = NetworkChecker.fromIpAddress(ip);
         resolutionLevels = -1;
         selectedResolutionLevel = -1;
         lastAction = System.currentTimeMillis();

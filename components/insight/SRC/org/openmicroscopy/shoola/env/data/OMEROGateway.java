@@ -2365,7 +2365,7 @@ class OMEROGateway
 				//ignore
 			}
 
-			networkChecker = new NetworkChecker(ip);
+			networkChecker = NetworkChecker.fromIpAddress(ip);
 		} catch (Throwable e) {
 			connected = false;
 			String s = "Can't connect to OMERO. OMERO info not valid.\n\n";
