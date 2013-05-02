@@ -34,18 +34,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-//Third-party libraries
-
-//Application-internal dependencies
 import omero.client;
 
 import org.openmicroscopy.shoola.env.Agent;
@@ -69,14 +66,18 @@ import org.openmicroscopy.shoola.env.rnd.RenderingControl;
 import org.openmicroscopy.shoola.env.ui.AbstractIconManager;
 import org.openmicroscopy.shoola.env.ui.UserNotifier;
 import org.openmicroscopy.shoola.svc.proxy.ProxyUtil;
+import org.openmicroscopy.shoola.util.NetworkChecker;
+import org.openmicroscopy.shoola.util.file.IOUtil;
 import org.openmicroscopy.shoola.util.ui.IconManager;
 import org.openmicroscopy.shoola.util.ui.MessageBox;
 import org.openmicroscopy.shoola.util.ui.NotificationDialog;
 import org.openmicroscopy.shoola.util.ui.ShutDownDialog;
 import org.openmicroscopy.shoola.util.ui.UIUtilities;
-import org.openmicroscopy.shoola.util.file.IOUtil;
+
 import pojos.ExperimenterData;
 import pojos.GroupData;
+//Third-party libraries
+//Application-internal dependencies
 
 /** 
  * A factory for the {@link OmeroDataService} and the {@link OmeroImageService}.
@@ -357,6 +358,22 @@ public class DataServicesFactory
     {
     	showNotificationDialog(title, message, false);
     }
+
+    /**
+     * Brings up a notification dialog.
+     * @param title     The dialog title.
+     * @param message   The dialog message.
+     * @param shutdown  Pass <code>true</code> to shut down the application
+     * <code>false otherwise</code>
+     */
+    private void showNotificationDialog(
+            String title,
+            String message,
+            boolean shutdown)
+    {
+        showNotificationDialog(title, message, shutdown, getCredentials());
+    }
+
     /**
      * Brings up a notification dialog.
      * 
@@ -366,13 +383,21 @@ public class DataServicesFactory
      * <code>false otherwise</code>
      */
     private void showNotificationDialog(String title, String message, boolean
-    		shutdown)
+               shutdown, UserCredentials userCredentials)
     {
+        if (null == userCredentials) {
+            throw new IllegalArgumentException(
+                    "User credentials should be available prior to notification");
+        }
+
+        String hostName = userCredentials.getHostName();
+        NetworkChecker networkChecker = NetworkChecker.fromHostName(hostName);
+
     	JFrame f = new JFrame();
     	f.setIconImage(AbstractIconManager.getOMEImageIcon());
     	
     	if (shutdown) {
-    		connectionDialog = new ShutDownDialog(f, title, message);
+               connectionDialog = new ShutDownDialog(f, title, message, networkChecker);
     	} else
     		connectionDialog = new NotificationDialog(f, title, message, null);
         //connectionDialog.setModal(false);

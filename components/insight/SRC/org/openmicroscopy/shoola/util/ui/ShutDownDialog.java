@@ -86,10 +86,12 @@ public class ShutDownDialog
 	 * Initializes the component.
 	 * 
 	 * @param time The time to wait before shutting down.
+	 * @param networkChecker The <code>NetworkChecker</code> instance used
+	 * to probe for network availability.
 	 */
-	private void initialize(int time)
+	private void initialize(int time, NetworkChecker networkChecker)
 	{
-		checker = NetworkChecker.fromDefaults();
+		checker = networkChecker;
 		removeWindowListener(windowAdapter);
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		remainingTime = time;
@@ -107,60 +109,71 @@ public class ShutDownDialog
 	/**
 	 * Creates a new dialog.
 	 * You have to call {@link #setVisible(boolean)} to actually display it
-     * on screen.
+         * on screen.
 	 * 
 	 * @param owner The parent window.
 	 * @param title The title to display on the title bar.
 	 * @param message The notification message.
 	 * @param time The time to wait before shutting down.
+	 * @param networkChecker The <code>NetworkChecker</code> instance used
+	 * to probe for network availability.
 	 */
 	public ShutDownDialog(JDialog owner, String title, String message,
-			int time) {
+			int time, NetworkChecker networkChecker) {
 		super(owner, title, message, null);
-		initialize(time);
+		initialize(time, networkChecker);
 	}
 	
 	/**
 	 * Creates a new dialog.
 	 * You have to call {@link #setVisible(boolean)} to actually display it
-     * on screen.
+         * on screen.
 	 * 
 	 * @param owner The parent window.
 	 * @param title The title to display on the title bar.
 	 * @param message The notification message.
 	 * @param time The time to wait before shutting down.
+	 * @param networkChecker The <code>NetworkChecker</code> instance used
+	 * to probe for network availability.
 	 */
-	public ShutDownDialog(JFrame owner, String title, String message, int time)
+	public ShutDownDialog(JFrame owner, String title, String message, 
+	        int time, NetworkChecker networkChecker)
 	{
 		super(owner, title, message, null);
-		initialize(time);
+		initialize(time, networkChecker);
 	}
 
 	/**
 	 * Creates a new dialog.
 	 * You have to call {@link #setVisible(boolean)} to actually display it
-     * on screen. The default time is set to {@link #DEFAULT_TIME}
+         * on screen. The default time is set to {@link #DEFAULT_TIME}
 	 * 
 	 * @param owner The parent window.
 	 * @param title The title to display on the title bar.
 	 * @param message The notification message.
+	 * @param networkChecker The <code>NetworkChecker</code> instance used
+	 * to probe for network availability.
 	 */
-	public ShutDownDialog(JDialog owner, String title, String message) {
-		this(owner, title, message, DEFAULT_TIME);
+	public ShutDownDialog(JDialog owner, String title, String message,
+	        NetworkChecker networkChecker) {
+		this(owner, title, message, DEFAULT_TIME, networkChecker);
 	}
 	
 	/**
 	 * Creates a new dialog.
 	 * You have to call {@link #setVisible(boolean)} to actually display it
-     * on screen. The default time is set to {@link #DEFAULT_TIME}
+         * on screen. The default time is set to {@link #DEFAULT_TIME}
 	 * 
 	 * @param owner The parent window.
 	 * @param title The title to display on the title bar.
 	 * @param message The notification message.
+	 * @param networkChecker The <code>NetworkChecker</code> instance used
+	 * to probe for network availability.
 	 */
-	public ShutDownDialog(JFrame owner, String title, String message)
+	public ShutDownDialog(JFrame owner, String title, String message,
+	        NetworkChecker networkChecker)
 	{
-		this(owner, title, message, DEFAULT_TIME);
+		this(owner, title, message, DEFAULT_TIME, networkChecker);
 	}
 	
 	/** 
