@@ -861,12 +861,15 @@ class RenderingControlProxy
             throw new NullPointerException("No security context.");
         this.ctx = ctx;
         slaves = new ArrayList<RenderingControl>();
-        // TODO: get rid of this default creation and fail fast when calling
-        // fromHostName() with user credentials parameters ?
-        checker = NetworkChecker.fromDefaults();
         UserCredentials uc = (UserCredentials)
         		context.lookup(LookupNames.USER_CREDENTIALS);
         checker = NetworkChecker.fromHostName(uc.getHostName());
+        if (null == checker) {
+            // host name resolution failed: we have no IP address to use for
+            // probing - fall back onto default NetworkChecker to avoid NPEs later on
+            // TODO: get rid of this and fail fast when calling fromHostName() breaks?
+            checker = NetworkChecker.fromDefaults();
+        }
         resolutionLevels = -1;
         selectedResolutionLevel = -1;
         lastAction = System.currentTimeMillis();
