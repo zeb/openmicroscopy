@@ -2358,14 +2358,7 @@ class OMEROGateway
 			secureClient.setAgent(agentName);
 			entryEncrypted = secureClient.createSession(userName, password);
 			serverVersion = getConfigService().getVersion();
-			String ip = null;
-	        try {
-				ip = InetAddress.getByName(hostName).getHostAddress();
-			} catch (Exception e) {
-				//ignore
-			}
-
-			networkChecker = NetworkChecker.fromIpAddress(ip);
+			networkChecker = NetworkChecker.fromHostName(hostName);
 		} catch (Throwable e) {
 			connected = false;
 			String s = "Can't connect to OMERO. OMERO info not valid.\n\n";

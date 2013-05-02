@@ -128,6 +128,46 @@ public class NetworkChecker {
             return new NetworkChecker(ipAddress);
         }
 
+        /**
+         * Creates a new NetworkChecker instance from a remote host name.
+         *
+         * @param hostName the remote host name to probe for network availability checks.
+         * @return @return a new <code>NetworkChecker<code> instance
+         * @throws IllegalArgumentException if the required hostName parameter is null or blank
+         */
+        public static NetworkChecker fromHostName(String hostName) {
+            if (null == hostName || hostName.trim().length() == 0) {
+                throw new IllegalArgumentException("Invalid host name: " + hostName);
+            }
+
+            String ip = resolveIpAddressFromHostName(hostName);
+
+            return NetworkChecker.fromIpAddress(ip);
+        }
+
+        /**
+         * Resolve a host name into an IP address.
+         *
+         * @param hostName the host name
+         * @return the IP address for requested the host, or <code>null</code>
+         * if the name resolution failed.
+         */
+        private static String resolveIpAddressFromHostName(String hostName) {
+            // Host name to IP resolution logic factored out of code from:
+            // - org.openmicroscopy.shoola.env.rnd.RenderingControlProxy#<ctor>
+            // - org.openmicroscopy.shoola.env.data.OMEROGateway#createSession
+
+            //TODO: add exception logging and/or fail fast rather than swallow error?
+            String ip = null;
+            try {
+                ip = InetAddress.getByName(hostName).getHostAddress();
+            } catch (Exception e) {
+                //ignore
+            }
+
+            return ip;
+        }
+
 	/**
 	 * Run the standard Java 1.6 check using reflection. If this is not 1.6 or later, then
 	 * exit successfully, printing this assumption to System.err. If any odd reflection error
