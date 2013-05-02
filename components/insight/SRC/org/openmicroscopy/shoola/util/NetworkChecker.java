@@ -108,6 +108,8 @@ public class NetworkChecker {
 	 * Creates a vanilla NetworkChecker instance.
 	 *
 	 * @return a new, default <code>NetworkChecker<code> instance
+	 * @deprecated All checks should be made using host and port parameters
+	 * retrieved from registry lookup. See #10824.
 	 */
 	public static NetworkChecker fromDefaults() {
 	    return new NetworkChecker();
