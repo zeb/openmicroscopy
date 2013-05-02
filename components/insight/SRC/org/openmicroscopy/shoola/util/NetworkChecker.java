@@ -24,19 +24,20 @@
 package org.openmicroscopy.shoola.util;
 
 //Java imports
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-
-//Third-party libraries
-
-//Application-internal dependencies
 import org.openmicroscopy.shoola.util.ui.UIUtilities;
+//Third-party libraries
+//Application-internal dependencies
 
 
 /** 
@@ -59,6 +60,14 @@ public class NetworkChecker {
 	/** Should we probe against host name and port as configured in
          *  the registry or the user credentials ? */
         static private boolean useIceConnectionParameters = true;
+
+        /** Should we perform network check using HTTP (true)
+         * or plain socket connection (false) ? */
+        static private boolean useHttpCheck = true;
+
+        // FIXME: temporary testing default port
+        static private String DEFAULT_ICE_PORT = "4063";
+        static private String HTTP_SCHEME = "http://";
 
 	static {
 		//
@@ -89,7 +98,12 @@ public class NetworkChecker {
 	 * or <code>null</code>.
 	 */
 	private String ipAddress;
-	
+
+	/**
+	 * The port number of the server the client is connected to.
+	 */
+	private String portNumber = DEFAULT_ICE_PORT;
+
 	/** Creates a new instance.
 	 */
 	private NetworkChecker()
@@ -221,14 +235,45 @@ public class NetworkChecker {
 	 *
 	 * @return true if the remote connection was successful.
 	 * @throws UnknownHostException If the remote connection attempt failed.
+	 * @throws IllegalStateException If the configured ipAddress is null or blank.
 	 */
 	public boolean remoteEndpointCheck() throws UnknownHostException {
+	    // basic internal state validation
+	    if (null == ipAddress || ipAddress.trim().length() == 0) {
+	        throw new IllegalStateException(
+	                "A remote endpoint name for probing should be configured");
+	    }
+	    if (null == portNumber || portNumber.trim().length() == 0) {
+                throw new IllegalStateException(
+                        "A remote endpoint port for probing should be configured");
+            }
+
 	    boolean networkup = false;
 
-	    // FIXME: stub implementation - always return true under Linux
-	    if (!useReflectiveCheck) {
-                return true;
-            }
+	    try {
+	        // mix and match previous network checking implementations for testing:
+	        // 1 - socket connection
+	        // 2 - HTTP URL
+	        // The implementation may be made configurable, or one be chosen
+	        // as default.
+	        // Note: need to account for cases where OMERO.server is beyond
+	        // the firewall and client has to connect through a proxy.
+	        if (useHttpCheck) {
+	            String endpointUrl = HTTP_SCHEME.concat(ipAddress);
+
+	            URL url = new URL(endpointUrl);
+                    InputStream is = url.openStream();
+                    is.close();
+	        } else {
+	            int endpointPort = Integer.parseInt(portNumber);
+
+	            Socket s = new Socket(ipAddress, endpointPort);
+	            s.close();
+	        }
+	        networkup = true;
+	    } catch (Exception ignore) {
+                // will report network as down
+	    }
 
 	    return networkup;
 	}
