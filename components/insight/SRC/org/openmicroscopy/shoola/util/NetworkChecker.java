@@ -56,6 +56,10 @@ public class NetworkChecker {
 	static private Method isLoopbackMethod = null;
 	static private boolean useReflectiveCheck = false;
 
+	/** Should we probe against host name and port as configured in
+         *  the registry or the user credentials ? */
+        static private boolean useIceConnectionParameters = true;
+
 	static {
 		//
 		// Perform static lookup via reflection of the methods
@@ -213,6 +217,23 @@ public class NetworkChecker {
 	}
 
 	/**
+	 * Run the network check using a connection to a remote host.
+	 *
+	 * @return true if the remote connection was successful.
+	 * @throws UnknownHostException If the remote connection attempt failed.
+	 */
+	public boolean remoteEndpointCheck() throws UnknownHostException {
+	    boolean networkup = false;
+
+	    // FIXME: stub implementation - always return true under Linux
+	    if (!useReflectiveCheck) {
+                return true;
+            }
+
+	    return networkup;
+	}
+
+	/**
 	 * Returns <code>true</code> if the network is still up, otherwise
 	 * throws an <code>UnknownHostException</code>.
 	 * 
@@ -226,10 +247,20 @@ public class NetworkChecker {
 		boolean networkup = false;
 		List<String> ips = new ArrayList<String>();
 		if (UIUtilities.isLinuxOS()) {
+		    if (useIceConnectionParameters) {
+                        // NetworkChecker should have been initialized with
+                        // the same connection parameters used by the client
+                        // to connect to the OMERO server: try and validate
+                        // network availability against that server instead
+                        // of going out to a unique external URL (and potential
+                        // point of failure).
+                        networkup = remoteEndpointCheck();
+                    } else {
 			// Not trying any connection on linux to prevent hangs.
 			// On Java 1.6+, reflectiveCheck will perform a proper check.
 			// On Java 1.5 and before, it will simply return true.
 			networkup = reflectiveCheck();
+                    }
 		} else {
 			Enumeration<NetworkInterface> interfaces =
 					NetworkInterface.getNetworkInterfaces();
