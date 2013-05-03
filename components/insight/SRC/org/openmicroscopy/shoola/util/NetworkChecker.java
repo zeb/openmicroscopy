@@ -65,8 +65,8 @@ public class NetworkChecker {
          * or plain socket connection (false) ? */
         static private boolean useHttpCheck = true;
 
-        // FIXME: temporary testing default port
-        static private String DEFAULT_ICE_PORT = "4063";
+        /** Default OMERO non-SSL port  */
+        static private int DEFAULT_ICE_PORT = 4063;
         static private String HTTP_SCHEME = "http://";
 
 	static {
@@ -102,7 +102,7 @@ public class NetworkChecker {
 	/**
 	 * The port number of the server the client is connected to.
 	 */
-	private String portNumber = DEFAULT_ICE_PORT;
+	private int portNumber;
 
 	/** Creates a new instance.
 	 */
@@ -119,9 +119,22 @@ public class NetworkChecker {
 	 */
 	private NetworkChecker(String ipAddress)
 	{
-		this.ipAddress = ipAddress;
+		this(ipAddress, DEFAULT_ICE_PORT);
 	}
 	
+	/**
+         * Creates a new instance.
+         *
+         * @param ipAddress The IP address of the server the client is connected to
+         * or <code>null</code>.
+         * @param port The port number of the server the client is connected to.
+         */
+        private NetworkChecker(String ipAddress, int port)
+        {
+                this.ipAddress = ipAddress;
+                this.portNumber = port;
+        }
+
 	/**
 	 * Creates a vanilla NetworkChecker instance.
 	 *
@@ -134,35 +147,66 @@ public class NetworkChecker {
 	}
 
 	/**
-         * Creates a new NetworkChecker instance from a remote IP address.
+         * Creates a new NetworkChecker instance from a remote IP address and
+         * the default OMERO.server non-SSL port (TCP/4063).
          *
          * @param ipAddress the remote address to probe for network availability checks.
          * @return a new <code>NetworkChecker<code> instance
          * @throws IllegalArgumentException if the required ipAdress parameter is null or blank
          */
         public static NetworkChecker fromIpAddress(String ipAddress) {
+            return NetworkChecker.fromIpAddress(ipAddress, DEFAULT_ICE_PORT);
+        }
+
+        /**
+         * Creates a new NetworkChecker instance from a remote IP address an port number.
+         *
+         * @param ipAddress the remote address to probe for network availability checks.
+         * @param port the remote port number to probe for network availability checks.
+         * @return a new <code>NetworkChecker<code> instance
+         * @throws IllegalArgumentException if the required ipAdress parameter is null or blank
+         */
+        public static NetworkChecker fromIpAddress(String ipAddress, int port) {
             if (null == ipAddress || ipAddress.trim().length() == 0) {
                 throw new IllegalArgumentException("Invalid IP adress: " + ipAddress);
             }
+            if (port <= 0) {
+                throw new IllegalArgumentException("Invalid port number: " + port);
+            }
 
-            return new NetworkChecker(ipAddress);
+            return new NetworkChecker(ipAddress, port);
         }
 
         /**
          * Creates a new NetworkChecker instance from a remote host name.
          *
          * @param hostName the remote host name to probe for network availability checks.
-         * @return @return a new <code>NetworkChecker<code> instance
+         * @return a new <code>NetworkChecker<code> instance
          * @throws IllegalArgumentException if the required hostName parameter is null or blank
          */
         public static NetworkChecker fromHostName(String hostName) {
+            return NetworkChecker.fromHostName(hostName, DEFAULT_ICE_PORT);
+        }
+
+        /**
+         * Creates a new NetworkChecker instance from a remote host name.
+         *
+         * @param hostName the remote host name to probe for network availability checks.
+         * @param port the remote port number to probe for network availability checks.
+         * @return a new <code>NetworkChecker<code> instance
+         * @throws IllegalArgumentException if the required hostName parameter is null or blank
+         */
+        public static NetworkChecker fromHostName(String hostName, int port) {
             if (null == hostName || hostName.trim().length() == 0) {
                 throw new IllegalArgumentException("Invalid host name: " + hostName);
+            }
+            if (port <= 0) {
+                throw new IllegalArgumentException("Invalid port number: " + port);
             }
 
             String ip = resolveIpAddressFromHostName(hostName);
 
-            return NetworkChecker.fromIpAddress(ip);
+            return NetworkChecker.fromIpAddress(ip, port);
         }
 
         /**
@@ -244,7 +288,7 @@ public class NetworkChecker {
 	        throw new IllegalStateException(
 	                "A remote endpoint name for probing should be configured");
 	    }
-	    if (null == portNumber || portNumber.trim().length() == 0) {
+	    if (portNumber <= 0) {
                 throw new IllegalStateException(
                         "A remote endpoint port for probing should be configured");
             }
@@ -276,11 +320,7 @@ public class NetworkChecker {
 
             boolean networkup = false;
             try {
-                // note: a NumberFormatException at this point would trigger
-                // a false negative on network status
-                int endpointPort = Integer.parseInt(portNumber);
-
-                Socket s = new Socket(ipAddress, endpointPort);
+                Socket s = new Socket(ipAddress, portNumber);
                 s.close();
 
                 networkup = true;

@@ -39,8 +39,8 @@ public class NetworkCheckerTest {
     private final static float JAVA_1_6 = 1.6f;
     private final static String BLANK_STRING = "     ";
 
-    // client is connecting through a web proxy
-    private final static boolean IS_WEB_PROXY_CONNECTION = true;
+    /** Is the TestNG "client" connecting through a web proxy? */
+    private final static boolean IS_WEB_PROXY_CONNECTION = false;
     private final static String HTTP_PROXY_HOST = "http.proxyHost";
     private final static String HTTP_PROXY_PORT = "http.proxyPort";
 
@@ -67,6 +67,22 @@ public class NetworkCheckerTest {
         NetworkChecker.fromHostName(BLANK_STRING);
     }
 
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromHostNameAndPortShouldRejectNullParameters() {
+        NetworkChecker.fromHostName(OMERO_FZK_DOT_DE_IPV4, -1);
+    }
+
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromHostNameAndPortShouldRejectBlankParameters() {
+        NetworkChecker.fromHostName(OMERO_FZK_DOT_DE_IPV4, 0);
+    }
+
 
     //---------------     NetworkChecker.fromIpAddress() tests    ---------------//
 
@@ -84,6 +100,22 @@ public class NetworkCheckerTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testFromIpAddressShouldRejectBlankParameters() {
         NetworkChecker.fromIpAddress(BLANK_STRING);
+    }
+
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromIpAddressAndPortShouldRejectNullParameters() {
+        NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4, -1);
+    }
+
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromIpAddressAndPortShouldRejectBlankParameters() {
+        NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4, 0);
     }
 
     /**
