@@ -69,6 +69,7 @@ public class NetworkChecker {
         /** Default OMERO non-SSL port */
         static private int DEFAULT_ICE_PORT = 4063;
         static private String HTTP_SCHEME = "http://";
+        static private String COLON = ":";
 
 	static {
 		//
@@ -345,7 +346,8 @@ public class NetworkChecker {
             try {
                 // note: a MalformedURLException at this point would trigger
                 // a false negative on network status
-                String endpointUrl = HTTP_SCHEME.concat(ipAddress);
+                String endpointUrl =
+                        HTTP_SCHEME + ipAddress + COLON + portNumber;
                 URL url = new URL(endpointUrl);
 
                 InputStream is = url.openStream();
