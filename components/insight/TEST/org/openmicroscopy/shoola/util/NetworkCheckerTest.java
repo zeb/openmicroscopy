@@ -39,10 +39,12 @@ public class NetworkCheckerTest {
     private final static float JAVA_1_6 = 1.6f;
     private final static String BLANK_STRING = "     ";
 
-    /** Is the TestNG "client" connecting through a web proxy? */
+    /** Is the TestNG "client" connecting through a web proxy?
+     *  (not the default case) */
     private final static boolean IS_WEB_PROXY_CONNECTION = false;
     private final static String HTTP_PROXY_HOST = "http.proxyHost";
     private final static String HTTP_PROXY_PORT = "http.proxyPort";
+    private final static int DEFAULT_ICE_TCP_PORT = 4063;
 
     // Karlsruher Institut für Technologie OMERO public demo server at ome2-copy.fzk.de
     //private final static String OMERO_FZK_DOT_DE = "ome2-copy.fzk.de";
@@ -52,26 +54,26 @@ public class NetworkCheckerTest {
     //---------------     NetworkChecker.fromHostName() tests    ---------------//
 
     /**
-     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String)}.
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromHostNameShouldRejectNullParameters() {
-        NetworkChecker.fromHostName(null);
-    }
-
-    /**
-     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String)}.
-     */
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromHostNameShouldRejectBlankParameters() {
-        NetworkChecker.fromHostName(BLANK_STRING);
+    public void testFromHostNameShouldRejectNullHostParameter() {
+        NetworkChecker.fromHostName(null, DEFAULT_ICE_TCP_PORT);
     }
 
     /**
      * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromHostNameAndPortShouldRejectNullParameters() {
+    public void testFromHostNameShouldRejectBlankHostParameter() {
+        NetworkChecker.fromHostName(BLANK_STRING, DEFAULT_ICE_TCP_PORT);
+    }
+
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromHostNameShouldRejectNullPortParameters() {
         NetworkChecker.fromHostName(OMERO_FZK_DOT_DE_IPV4, -1);
     }
 
@@ -79,7 +81,7 @@ public class NetworkCheckerTest {
      * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromHostName(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromHostNameAndPortShouldRejectBlankParameters() {
+    public void testFromHostNameShouldRejectBlankPortParameter() {
         NetworkChecker.fromHostName(OMERO_FZK_DOT_DE_IPV4, 0);
     }
 
@@ -87,26 +89,26 @@ public class NetworkCheckerTest {
     //---------------     NetworkChecker.fromIpAddress() tests    ---------------//
 
     /**
-     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String)}.
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromIpAddressShouldRejectNullParameters() {
-        NetworkChecker.fromIpAddress(null);
-    }
-
-    /**
-     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String)}.
-     */
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromIpAddressShouldRejectBlankParameters() {
-        NetworkChecker.fromIpAddress(BLANK_STRING);
+    public void testFromIpAddressShouldRejectNullHostParameter() {
+        NetworkChecker.fromIpAddress(null, DEFAULT_ICE_TCP_PORT);
     }
 
     /**
      * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromIpAddressAndPortShouldRejectNullParameters() {
+    public void testFromIpAddressShouldRejectBlankHostParameter() {
+        NetworkChecker.fromIpAddress(BLANK_STRING, DEFAULT_ICE_TCP_PORT);
+    }
+
+    /**
+     * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
+     */
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromIpAddressShouldRejectNullPortParameter() {
         NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4, -1);
     }
 
@@ -114,7 +116,7 @@ public class NetworkCheckerTest {
      * Test method for {@link org.openmicroscopy.shoola.util.NetworkChecker#fromIpAddress(java.lang.String,java.lang.String)}.
      */
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testFromIpAddressAndPortShouldRejectBlankParameters() {
+    public void testFromIpAddressShouldRejectBlankPortParameter() {
         NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4, 0);
     }
 
@@ -124,7 +126,10 @@ public class NetworkCheckerTest {
     @Test(enabled = IS_WEB_PROXY_CONNECTION,
           groups = { "os-linux", "with-proxy", "tcp-check" } )
     public void testRemoteEndpointSocketCheckShouldTimeoutOnLinuxBehindProxy() {
-        NetworkChecker checker = NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4);
+        NetworkChecker checker =
+                NetworkChecker.fromIpAddress(
+                        OMERO_FZK_DOT_DE_IPV4,
+                        DEFAULT_ICE_TCP_PORT);
 
         if (UIUtilities.isLinuxOS()) {
             boolean isNetworkUp = checker.remoteEndpointSocketCheck();
@@ -142,7 +147,10 @@ public class NetworkCheckerTest {
     @Test(enabled = IS_WEB_PROXY_CONNECTION,
           groups = { "os-linux", "with-proxy", "jvm-proxy-off", "http-check" } )
     public void testRemoteEndpointHttpCheckShouldTimeoutOnLinuxBehindProxy() {
-        NetworkChecker checker = NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4);
+        NetworkChecker checker =
+                NetworkChecker.fromIpAddress(
+                        OMERO_FZK_DOT_DE_IPV4,
+                        DEFAULT_ICE_TCP_PORT);
 
         if (UIUtilities.isLinuxOS()) {
             String httpProxyHostSystemProp = System.getProperty(HTTP_PROXY_HOST);
@@ -165,7 +173,10 @@ public class NetworkCheckerTest {
     @Test(enabled = IS_WEB_PROXY_CONNECTION,
           groups = { "os-linux", "with-proxy", "jvm-proxy-on", "http-check" } )
     public void testRemoteEndpointHttpCheckShouldConnectOnLinuxBehindProxy() {
-        NetworkChecker checker = NetworkChecker.fromIpAddress(OMERO_FZK_DOT_DE_IPV4);
+        NetworkChecker checker =
+                NetworkChecker.fromIpAddress(
+                        OMERO_FZK_DOT_DE_IPV4,
+                        DEFAULT_ICE_TCP_PORT);
 
         if (UIUtilities.isLinuxOS()) {
             String httpProxyHostSystemProp = System.getProperty(HTTP_PROXY_HOST);

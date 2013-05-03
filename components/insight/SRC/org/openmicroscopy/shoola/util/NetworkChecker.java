@@ -66,8 +66,6 @@ public class NetworkChecker {
          * or plain TCP socket connection (if set to false) ? */
         static private boolean useHttpCheck = true;
 
-        /** Default OMERO non-SSL port */
-        static private int DEFAULT_ICE_PORT = 4063;
         static private String HTTP_SCHEME = "http://";
         static private String COLON = ":";
 
@@ -110,18 +108,7 @@ public class NetworkChecker {
 	 */
 	private NetworkChecker()
 	{
-		this(null);
-	}
-	
-	/**
-	 * Creates a new instance.
-	 * 
-	 * @param ipAddress The IP address of the server the client is connected to
-	 * or <code>null</code>.
-	 */
-	private NetworkChecker(String ipAddress)
-	{
-		this(ipAddress, DEFAULT_ICE_PORT);
+		this(null, -1);
 	}
 	
 	/**
@@ -149,18 +136,6 @@ public class NetworkChecker {
 	}
 
 	/**
-         * Creates a new NetworkChecker instance from a remote IP address and
-         * the default OMERO.server non-SSL port (TCP/4063).
-         *
-         * @param ipAddress the remote address to probe for network availability checks.
-         * @return a new <code>NetworkChecker<code> instance
-         * @throws IllegalArgumentException if the required ipAdress parameter is null or blank
-         */
-        public static NetworkChecker fromIpAddress(String ipAddress) {
-            return NetworkChecker.fromIpAddress(ipAddress, DEFAULT_ICE_PORT);
-        }
-
-        /**
          * Creates a new NetworkChecker instance from a remote IP address an port number.
          *
          * @param ipAddress the remote address to probe for network availability checks.
@@ -177,17 +152,6 @@ public class NetworkChecker {
             }
 
             return new NetworkChecker(ipAddress, port);
-        }
-
-        /**
-         * Creates a new NetworkChecker instance from a remote host name.
-         *
-         * @param hostName the remote host name to probe for network availability checks.
-         * @return a new <code>NetworkChecker<code> instance
-         * @throws IllegalArgumentException if the required hostName parameter is null or blank
-         */
-        public static NetworkChecker fromHostName(String hostName) {
-            return NetworkChecker.fromHostName(hostName, DEFAULT_ICE_PORT);
         }
 
         /**
