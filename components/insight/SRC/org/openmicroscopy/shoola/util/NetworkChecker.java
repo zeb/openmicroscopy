@@ -24,11 +24,9 @@
 package org.openmicroscopy.shoola.util;
 
 //Java imports
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.URL;
