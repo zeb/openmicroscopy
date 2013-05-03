@@ -64,7 +64,7 @@ public class NetworkChecker {
 
         /** Should we perform network check using HTTP (if set to true)
          * or plain TCP socket connection (if set to false) ? */
-        static private boolean useHttpCheck = true;
+        static private boolean useHttpCheck = false;
 
         static private String HTTP_SCHEME = "http://";
         static private String COLON = ":";
