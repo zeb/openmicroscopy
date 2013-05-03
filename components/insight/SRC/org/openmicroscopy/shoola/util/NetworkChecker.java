@@ -24,9 +24,11 @@
 package org.openmicroscopy.shoola.util;
 
 //Java imports
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.URL;
@@ -233,11 +235,12 @@ public class NetworkChecker {
 	/**
 	 * Run the network check using a connection to a remote host.
 	 *
-	 * @return true if the remote connection was successful.
-	 * @throws UnknownHostException If the remote connection attempt failed.
-	 * @throws IllegalStateException If the configured ipAddress is null or blank.
+	 * @return true if the remote connection was successful, false otherwise.
+	 * @throws IllegalStateException If either of the configured ipAddress or
+	 * port number are null or blank.
 	 */
-	protected boolean remoteEndpointCheck() throws UnknownHostException {
+	protected boolean remoteEndpointCheck() {
+
 	    // basic internal state validation
 	    if (null == ipAddress || ipAddress.trim().length() == 0) {
 	        throw new IllegalStateException(
@@ -250,34 +253,74 @@ public class NetworkChecker {
 
 	    boolean networkup = false;
 
-	    try {
-	        // mix and match previous network checking implementations for testing:
-	        // 1 - socket connection
-	        // 2 - HTTP URL
-	        // The implementation may be made configurable, or one be chosen
-	        // as default.
-	        // Note: need to account for cases where OMERO.server is beyond
-	        // the firewall and client has to connect through a proxy.
-	        if (useHttpCheck) {
-	            String endpointUrl = HTTP_SCHEME.concat(ipAddress);
-
-	            URL url = new URL(endpointUrl);
-                    InputStream is = url.openStream();
-                    is.close();
-	        } else {
-	            int endpointPort = Integer.parseInt(portNumber);
-
-	            Socket s = new Socket(ipAddress, endpointPort);
-	            s.close();
-	        }
-	        networkup = true;
-	    } catch (Exception ignore) {
-                // will report network as down
-	        // LOGGING at WARN
-	    }
+	    // mix and match previous network checking implementations for testing:
+            // 1 - socket connection
+            // 2 - HTTP URL
+            // The implementation may be made configurable, or one be chosen
+            // as default.
+            // Note: need to account for cases where OMERO.server is beyond
+            // the firewall and client has to connect through a proxy.
+            if (useHttpCheck) {
+                networkup = remoteEndpointHttpCheck();
+            } else {
+                networkup = remoteEndpointSocketCheck();
+            }
 
 	    return networkup;
 	}
+
+        /**
+         * Run the network check using a TCP socket connection to a remote host.
+         *
+         * @return true if the remote connection was successful, false otherwise.
+         */
+        protected boolean remoteEndpointSocketCheck() {
+
+            boolean networkup = false;
+            try {
+                // note: a NumberFormatException at this point would trigger
+                // a false negative on network status
+                int endpointPort = Integer.parseInt(portNumber);
+
+                Socket s = new Socket(ipAddress, endpointPort);
+                s.close();
+
+                networkup = true;
+            } catch (Exception e) {
+                // will report network as down
+                // LOGGING at WARN
+                networkup = false;
+            }
+
+            return networkup;
+        }
+
+        /**
+         * Run the network check using an HTTP URL connection to a remote host.
+         *
+         * @return true if the remote connection was successful, false otherwise.
+         */
+        protected boolean remoteEndpointHttpCheck() {
+
+            boolean networkup = false;
+            try {
+                // note: a MalformedURLException at this point would trigger
+                // a false negative on network status
+                String endpointUrl = HTTP_SCHEME.concat(ipAddress);
+                URL url = new URL(endpointUrl);
+
+                InputStream is = url.openStream();
+                is.close();
+
+                networkup = true;
+            } catch (Exception e) {
+                // will report network as down
+                // LOGGING at WARN
+                networkup = false;
+            }
+
+            return networkup;
+        }
 
 	/**
 	 * Returns <code>true</code> if the network is still up, otherwise
@@ -308,6 +351,8 @@ public class NetworkChecker {
 			networkup = reflectiveCheck();
                     }
 		} else {
+		        // "classic" Java 1.6+ NIC check via direct method invocation
+		        // might want to factor out a new networkInterfacesCheck() method?
 			Enumeration<NetworkInterface> interfaces =
 					NetworkInterface.getNetworkInterfaces();
 			if (interfaces != null) {
