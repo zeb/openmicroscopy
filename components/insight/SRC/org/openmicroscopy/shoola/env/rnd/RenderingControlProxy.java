@@ -31,7 +31,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -863,7 +862,7 @@ class RenderingControlProxy
         slaves = new ArrayList<RenderingControl>();
         UserCredentials uc = (UserCredentials)
         		context.lookup(LookupNames.USER_CREDENTIALS);
-        checker = NetworkChecker.fromHostName(uc.getHostName());
+        checker = NetworkChecker.fromHostName(uc.getHostName(), uc.getPort());
         if (null == checker) {
             // host name resolution failed: we have no IP address to use for
             // probing - fall back onto default NetworkChecker to avoid NPEs later on

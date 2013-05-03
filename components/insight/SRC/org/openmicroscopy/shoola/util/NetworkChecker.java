@@ -58,14 +58,15 @@ public class NetworkChecker {
 	static private boolean useReflectiveCheck = false;
 
 	/** Should we probe against host name and port as configured in
-         *  the registry or the user credentials ? */
+         *  the registry or the user credentials ?
+         *  If set to false, probe will be attempted using reflectiveCheck */
         static private boolean useIceConnectionParameters = true;
 
-        /** Should we perform network check using HTTP (true)
-         * or plain socket connection (false) ? */
+        /** Should we perform network check using HTTP (if set to true)
+         * or plain TCP socket connection (if set to false) ? */
         static private boolean useHttpCheck = true;
 
-        /** Default OMERO non-SSL port  */
+        /** Default OMERO non-SSL port */
         static private int DEFAULT_ICE_PORT = 4063;
         static private String HTTP_SCHEME = "http://";
 

@@ -391,7 +391,8 @@ public class DataServicesFactory
         }
 
         String hostName = userCredentials.getHostName();
-        NetworkChecker networkChecker = NetworkChecker.fromHostName(hostName);
+        int port = userCredentials.getPort();
+        NetworkChecker networkChecker = NetworkChecker.fromHostName(hostName, port);
 
     	JFrame f = new JFrame();
     	f.setIconImage(AbstractIconManager.getOMEImageIcon());
