@@ -172,7 +172,7 @@ public class NetworkChecker {
          * @return the IP address for requested the host, or <code>null</code>
          * if the name resolution failed.
          */
-        private static String resolveIpAddressFromHostName(String hostName) {
+        protected static String resolveIpAddressFromHostName(String hostName) {
             // Host name to IP resolution logic factored out of code from:
             // - org.openmicroscopy.shoola.env.rnd.RenderingControlProxy#<ctor>
             // - org.openmicroscopy.shoola.env.data.OMEROGateway#createSession
@@ -198,7 +198,7 @@ public class NetworkChecker {
 	 * @throws UnknownHostException
 	 */
 	@SuppressWarnings({ "rawtypes"})
-	public boolean reflectiveCheck() throws UnknownHostException {
+	protected boolean reflectiveCheck() throws UnknownHostException {
 
 		if (!useReflectiveCheck) {
 			return true;
@@ -237,7 +237,7 @@ public class NetworkChecker {
 	 * @throws UnknownHostException If the remote connection attempt failed.
 	 * @throws IllegalStateException If the configured ipAddress is null or blank.
 	 */
-	public boolean remoteEndpointCheck() throws UnknownHostException {
+	protected boolean remoteEndpointCheck() throws UnknownHostException {
 	    // basic internal state validation
 	    if (null == ipAddress || ipAddress.trim().length() == 0) {
 	        throw new IllegalStateException(
@@ -273,6 +273,7 @@ public class NetworkChecker {
 	        networkup = true;
 	    } catch (Exception ignore) {
                 // will report network as down
+	        // LOGGING at WARN
 	    }
 
 	    return networkup;
